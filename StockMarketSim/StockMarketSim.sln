@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31611.283
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockMarketSim", "StockMarketSim\StockMarketSim.csproj", "{830A5A1B-24D1-4647-867D-A9629404798C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetStockData", "..\..\StockMarketSim copy\StockMarketSim\GetStockData\GetStockData.csproj", "{6A819306-9591-4B15-8F2F-9E1650391CC9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +19,10 @@ Global
 		{830A5A1B-24D1-4647-867D-A9629404798C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{830A5A1B-24D1-4647-867D-A9629404798C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{830A5A1B-24D1-4647-867D-A9629404798C}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{6A819306-9591-4B15-8F2F-9E1650391CC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A819306-9591-4B15-8F2F-9E1650391CC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A819306-9591-4B15-8F2F-9E1650391CC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A819306-9591-4B15-8F2F-9E1650391CC9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
