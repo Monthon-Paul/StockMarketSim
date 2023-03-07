@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+namespace Stock;
 
 public class StockData {
 	public string Symbol { get; set; }
@@ -191,7 +192,7 @@ public class GetStock {
 	}
 
 	private static DateTime DateFormat(string date) {
-		string[] arr = Regex.Split(date, "[-]");
+		string[] arr = date.Split('-');
 		return new DateTime(Int32.Parse(arr[0]), Int32.Parse(arr[1]), Int32.Parse(arr[2]));
 	}
 }
