@@ -197,9 +197,9 @@ public class Portfolio {
 
 		using (HttpClient client = new HttpClient()) {
 			HttpResponseMessage response = await client.GetAsync(apiUrl);
-			if (response.IsSuccessStatusCode) {
-				string result = await response.Content.ReadAsStringAsync();
-				JsonDocument json = JsonDocument.Parse(result);
+			response.EnsureSuccessStatusCode();
+			string result = await response.Content.ReadAsStringAsync();
+			using (JsonDocument json = JsonDocument.Parse(result)) {
 				JsonElement root = json.RootElement;
 				JsonElement globalQuote = root.GetProperty("Global Quote");
 
@@ -212,11 +212,8 @@ public class Portfolio {
 					Date = DateFormat(globalQuote.GetProperty("07. latest trading day").GetString()),
 					Percent = globalQuote.GetProperty("10. change percent").GetString()
 				};
-				//await Task.Delay(500);
 
 				return stockData;
-			} else {
-				throw new Exception($"Failed to retrieve data for symbol {symbol}");
 			}
 		}
 	}

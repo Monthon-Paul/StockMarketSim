@@ -162,7 +162,6 @@ public class GetStock {
 		}
 	}
 
-
 	public static async Task<StockData> GetStockData(string symbol) {
 		string apiKey = "CN0WTTYL7GCVQ5E3";
 		string apiUrl = $"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={apiKey}";

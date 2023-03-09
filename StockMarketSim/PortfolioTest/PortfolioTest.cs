@@ -6,11 +6,11 @@ using Stock;
 namespace PortfolioTest;
 
 /// <summary>
-/// Testing the Funcitonality of Spreadsheet
+/// Testing the Funcitonality of Portfolion
 /// </summary>
 ///
 /// Author: Monthon Paul
-/// Version: September 24 2022 1.0
+/// Version: March 8 2023 1.0
 [TestClass]
 public class PortfolioTest {
 	// ********************* Valid Testing *********************//
@@ -37,7 +37,7 @@ public class PortfolioTest {
 		Portfolio user = new Portfolio("Bob");
 		user.BuyStocks("AAPL", 20);
 
-		Assert.AreEqual(20, user.GetShares("AAPL"));
+		Assert.AreEqual(20u, user.GetShares("AAPL"));
 		Assert.AreEqual("Bob", user.name);
 		Assert.AreEqual(user.userCashBalance, user.userCashBalance);
 	}
@@ -46,6 +46,7 @@ public class PortfolioTest {
 	public void Test2Constructors() {
 		Portfolio user = new Portfolio();
 		user.BuyStocks("AAPL", 5);
+		Thread.Sleep(10000);
 		user.BuyStocks("DAL", 2);
 		user.Save("TestSanitySave.txt");
 
@@ -60,12 +61,14 @@ public class PortfolioTest {
 	public void TestBuyGetShares() {
 		Portfolio user = new Portfolio();
 		user.BuyStocks("AAPL", 10);
+		Thread.Sleep(10000);
 		user.BuyStocks("DAL", 5);
+		Thread.Sleep(10000);
 		user.BuyStocks("F", 10);
 
-		Assert.AreEqual(10, user.GetShares("AAPL"));
-		Assert.AreEqual(5, user.GetShares("DAL"));
-		Assert.AreEqual(10, user.GetShares("F"));
+		Assert.AreEqual(10u, user.GetShares("AAPL"));
+		Assert.AreEqual(5u, user.GetShares("DAL"));
+		Assert.AreEqual(10u, user.GetShares("F"));
 		Assert.AreEqual(user.userCashBalance, user.userCashBalance);
 	}
 
@@ -77,13 +80,16 @@ public class PortfolioTest {
 		Assert.AreEqual(10_000, user.userCashBalance);
 
 		user.BuyStocks("AAPL", 10);
+		Thread.Sleep(10000);
 		user.BuyStocks("DAL", 5);
-
+		Thread.Sleep(10000);
 		user.SellStocks("AAPL", 5);
+		Thread.Sleep(10000);
 		user.SellStocks("DAL", 5);
+		Thread.Sleep(10000);
 
-		Assert.AreEqual(0, user.GetShares("DAL"));
-		Assert.AreEqual(5, user.GetShares("AAPL"));
+		Assert.AreEqual(0u, user.GetShares("DAL"));
+		Assert.AreEqual(5u, user.GetShares("AAPL"));
 		Assert.AreEqual(user.userCashBalance, user.userCashBalance);
 	}
 }
