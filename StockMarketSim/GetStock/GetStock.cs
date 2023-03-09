@@ -2,7 +2,8 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-namespace Stock;
+
+namespace StockData;
 
 public class StockData {
 	public string Symbol { get; set; }
@@ -16,7 +17,7 @@ public class StockData {
 
 public class GetStock {
 
-	private static decimal userCashBalance = 1_000;
+	private static decimal userCashBalance = 10_000;
 	private static Dictionary<string, int> userPortfolio = new();
 
 	public static void Main(string[] args) {
@@ -162,7 +163,7 @@ public class GetStock {
 	}
 
 
-	private static async Task<StockData> GetStockData(string symbol) {
+	public static async Task<StockData> GetStockData(string symbol) {
 		string apiKey = "CN0WTTYL7GCVQ5E3";
 		string apiUrl = $"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={apiKey}";
 
@@ -190,6 +191,20 @@ public class GetStock {
 			}
 		}
 	}
+
+	//private static async Task<AlphaVantageResponse> GetStockDaily(string symbol) {
+	//	string apiKey = "CN0WTTYL7GCVQ5E3";
+	//	string apiUrl = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={symbol}&apikey={apiKey}";
+
+	//	using (HttpClient client = new HttpClient()) {
+	//		HttpResponseMessage response = await client.GetAsync(apiUrl);
+	//		if (response.IsSuccessStatusCode) {
+	//			string result = await response.Content.ReadAsStringAsync();
+	//		} else {
+	//			throw new Exception($"Failed to retrieve data for symbol {symbol}");
+	//		}
+	//	}
+	//}
 
 	private static DateTime DateFormat(string date) {
 		string[] arr = date.Split('-');
