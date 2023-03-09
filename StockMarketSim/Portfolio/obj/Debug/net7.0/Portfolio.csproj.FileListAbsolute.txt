@@ -1,0 +1,12 @@
+/Users/monthonpaul/Projects/StockMarketSim/StockMarketSim/Portfolio/bin/Debug/net7.0/Portfolio.deps.json
+/Users/monthonpaul/Projects/StockMarketSim/StockMarketSim/Portfolio/bin/Debug/net7.0/Portfolio.dll
+/Users/monthonpaul/Projects/StockMarketSim/StockMarketSim/Portfolio/bin/Debug/net7.0/Portfolio.pdb
+/Users/monthonpaul/Projects/StockMarketSim/StockMarketSim/Portfolio/obj/Debug/net7.0/Portfolio.csproj.AssemblyReference.cache
+/Users/monthonpaul/Projects/StockMarketSim/StockMarketSim/Portfolio/obj/Debug/net7.0/Portfolio.GeneratedMSBuildEditorConfig.editorconfig
+/Users/monthonpaul/Projects/StockMarketSim/StockMarketSim/Portfolio/obj/Debug/net7.0/Portfolio.AssemblyInfoInputs.cache
+/Users/monthonpaul/Projects/StockMarketSim/StockMarketSim/Portfolio/obj/Debug/net7.0/Portfolio.AssemblyInfo.cs
+/Users/monthonpaul/Projects/StockMarketSim/StockMarketSim/Portfolio/obj/Debug/net7.0/Portfolio.csproj.CoreCompileInputs.cache
+/Users/monthonpaul/Projects/StockMarketSim/StockMarketSim/Portfolio/obj/Debug/net7.0/Portfolio.dll
+/Users/monthonpaul/Projects/StockMarketSim/StockMarketSim/Portfolio/obj/Debug/net7.0/refint/Portfolio.dll
+/Users/monthonpaul/Projects/StockMarketSim/StockMarketSim/Portfolio/obj/Debug/net7.0/Portfolio.pdb
+/Users/monthonpaul/Projects/StockMarketSim/StockMarketSim/Portfolio/obj/Debug/net7.0/ref/Portfolio.dll
