@@ -3,18 +3,25 @@ Authors: Monthon Paul
 
 Current Version: 1.0
 
-Last Updated: 03/05/2023
+Last Updated: 03/09/2023
 
 # Purpose: 
 
-This Applicaiton is to replicate the Stock Market Game of using a Simulator Application, it's to have the basis idea of how 
+This Applicaiton is to replicate the Stock Market Simulator Application, it's to have the basis idea of how 
 the Stock Market works. For the program I am grabing all the Stock Data from Alpha Vantage API. The intend is it to be a small application where 
-the User can buy/sell stocks to make a profit. The User can save their process into a ".stk" in JSON format, example being "stock.stk"
+the User can Buy/Sell stocks to make a profit. The User can save their process into a ".stk" in JSON format, example being "stock.stk"
 
 For more details, please look in the "About"/"How to Use" in the help tab.
+
+# My Plans:
+- [x] Finish Model Logic
+- [ ] Build the Application
+- [ ] Add a Stock Market Chart UI
+- [ ] Add a serch bar for tinker search
+- [ ] add extra features like Short seling
  
-# How the spreadsheet works:
-Users will start with a balance of $1,000 where they can play the game in order to make profit or lose profit. It's a simulator so the User can have experience learning how the Stock Market works and should learn how it works.
+# How the StockMarketSim works:
+Users will start with a balance of $10,000 where they can play the game in order to make profit or lose profit. It's a simulator so the User can have experience learning how the Stock Market works and should learn how it works.
 
 In the file tab, there is "New", "Open", "Save", and "Save As".  New creates a New Portfolio, Open allows user to open their Data, Save saves the the User Data, and Save As lets you save to a specific location.
 
