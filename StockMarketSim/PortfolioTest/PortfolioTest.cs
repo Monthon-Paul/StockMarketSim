@@ -147,7 +147,7 @@ public class PortfolioTest {
 	//********************** Exception Testing ************************//
 
 	/// <summary>
-	/// Testing all invalid Cells names
+	/// Testing Buying Zero Shares
 	/// </summary>
 	[TestMethod]
 	[ExpectedException(typeof(LowStockException))]
@@ -157,7 +157,7 @@ public class PortfolioTest {
 	}
 
 	/// <summary>
-	/// Testing all invalid Cells names
+	/// Testing Buying Negative Stocks
 	/// </summary>
 	[TestMethod]
 	[ExpectedException(typeof(LowStockException))]
@@ -167,7 +167,7 @@ public class PortfolioTest {
 	}
 
 	/// <summary>
-	/// Testing all invalid Cells names
+	/// Testing Buying less than 10 Stocks
 	/// </summary>
 	[TestMethod]
 	[ExpectedException(typeof(LowStockException))]
