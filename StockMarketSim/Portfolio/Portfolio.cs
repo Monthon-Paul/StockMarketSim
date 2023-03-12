@@ -109,7 +109,7 @@ public class Portfolio {
 	/// <summary>
 	/// Allow User to Buy Stocks from grabing from the API
 	/// </summary>
-	/// <param name="symbol"> Stock Tinker Symbol</param>
+	/// <param name="symbol"> Stock Ticker Symbol</param>
 	/// <param name="quantity"> Shares must be higher than 10 </param>
 	/// <exception cref="LowStockException"> an Error when either Shares are lower than 10 shares</exception>
 	public void BuyStocks(string symbol, int quantity) {
@@ -156,7 +156,7 @@ public class Portfolio {
 	/// <summary>
 	/// Allow User to Sell Stocks from grabing from the API
 	/// </summary>
-	/// <param name="symbol"> Stock Tinker Symbol</param>
+	/// <param name="symbol"> Stock Ticker Symbol</param>
 	/// <param name="quantity"> Shares must be higher than 10 </param>
 	/// <exception cref="LowStockException"> an Error when either Shares are lower than 10 shares</exception>
 	public void SellStocks(string symbol, int quantity) {
@@ -188,7 +188,7 @@ public class Portfolio {
 			// Remove shares from user's portfolio
 			userPortfolio[symbol] -= quantity;
 
-			// If Shares are at 0, then remove Tinker symbol for User
+			// If Shares are at 0, then remove Ticker symbol for User
 			if (userPortfolio[symbol] is 0) {
 				userPortfolio.Remove(symbol);
 			}
@@ -199,9 +199,9 @@ public class Portfolio {
 	}
 
 	/// <summary>
-	/// Allow the User to get Shares base on Tinker symbol
+	/// Allow the User to get Shares base on Ticker symbol
 	/// </summary>
-	/// <param name="symbol">Stock Tinker Symbol</param>
+	/// <param name="symbol">Stock Ticker Symbol</param>
 	/// <returns> The amount of Shares </returns>
 	public int GetShares(string symbol) {
 		if (userPortfolio.ContainsKey(symbol)) {
@@ -253,7 +253,7 @@ public class Portfolio {
 	/// <summary>
 	/// Grab Stock Data from the Alpha Vantage API
 	/// </summary>
-	/// <param name="symbol">Stock Tinker Symbol</param>
+	/// <param name="symbol">Stock Ticker Symbol</param>
 	/// <returns> StockData </returns>
 	private static async Task<StockData> GetStockData(string symbol) {
 		string apiKey = "CN0WTTYL7GCVQ5E3";
