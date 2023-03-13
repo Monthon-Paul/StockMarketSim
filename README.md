@@ -3,7 +3,7 @@ Authors: Monthon Paul
 
 Current Version: 1.0
 
-Last Updated: 03/09/2023
+Last Updated: 03/12/2023
 
 # Purpose: 
 
@@ -15,9 +15,9 @@ For more details, please look in the "About"/"How to Use" in the help tab.
 
 # My Plans:
 - [x] Finish Model Logic
+- [x] Add a serch bar for tinker search
+- [x] Add a Stock Market Chart UI
 - [ ] Build the Application
-- [ ] Add a Stock Market Chart UI
-- [ ] Add a serch bar for tinker search
 - [ ] add extra features like Short seling
  
 # How the StockMarketSim works:
@@ -51,11 +51,11 @@ Run the MAUI app either on Windows or MacOS (but first locate your directory for
 For MacOS
 ```
 cd StockMarketSim
-dotnet build -t:Run -f net6.0-maccatalyst
+dotnet build -t:Run -f net7.0-maccatalyst
 ```
 
 For Windows
 ```
 cd StockMarketSim
-dotnet build -t:Run -f net6.0-windows
+dotnet build -t:Run -f net7.0-windows
 ```
