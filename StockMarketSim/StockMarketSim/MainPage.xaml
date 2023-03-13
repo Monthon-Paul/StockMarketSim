@@ -1,42 +1,86 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="StockMarketSim.MainPage">
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui"
+             xmlns:local="clr-namespace:StockMarketSim"
+             x:Class="StockMarketSim.MainPage"
+             Title="Stock Market Simulator">
 
-    <ScrollView>
-        <VerticalStackLayout
-            Spacing="25"
-            Padding="30,0"
-            VerticalOptions="Center">
+    <ContentPage.MenuBarItems>
+        <MenuBarItem Text="Help">
+            <MenuFlyoutItem Text="ℹ About"  Clicked="AboutClicked" />
+            <MenuFlyoutItem Text="？How to Play" Clicked="HTPClicked" />
+        </MenuBarItem>
+    </ContentPage.MenuBarItems>
 
-            <Image
-                Source="dotnet_bot.png"
-                SemanticProperties.Description="Cute dot net bot waving hi to you!"
-                HeightRequest="200"
-                HorizontalOptions="Center" />
+    <ContentPage.BindingContext>
+        <local:StockChartViewModel/>
+    </ContentPage.BindingContext>
+    <Grid ColumnDefinitions = "2*, *"
+          RowDefinitions="75, *, 75"
+          RowSpacing="5">
+        <HorizontalStackLayout
+					Spacing = "25"
+					Margin="10"
+                    VerticalOptions="Start"
+                    Grid.Row="0">
+            <Button Text = "New"
+						Clicked="NewClick"
+                        x:Name="NewButton"
+                        HorizontalOptions="Center"/>
+            <Button Text = "Load"
+						Clicked="LoadButton"
+                        HorizontalOptions="Center"/>
+            <Button Text = "Save"
+						Clicked="SaveButton"
+                        HorizontalOptions="Center"/>
+            <Button Text = "Save As"
+						Clicked="SaveAsButton"
+                        HorizontalOptions="Center"/>
+        </HorizontalStackLayout>
 
-            <Label
-                Text="Hello, World!"
-                SemanticProperties.HeadingLevel="Level1"
-                FontSize="32"
-                HorizontalOptions="Center" />
-
-            <Label
-                Text="Welcome to .NET Multi-platform App UI"
-                SemanticProperties.HeadingLevel="Level2"
-                SemanticProperties.Description="Welcome to dot net Multi platform App U I"
-                FontSize="18"
-                HorizontalOptions="Center" />
-
-            <Button
-                x:Name="CounterBtn"
-                Text="Click me"
-                SemanticProperties.Hint="Counts the number of times you click"
-                Clicked="OnCounterClicked"
-                HorizontalOptions="Center" />
-
-        </VerticalStackLayout>
-    </ScrollView>
-
+        <lvc:CartesianChart
+                Grid.Row="1"
+                Series="{Binding Series}"
+                XAxes="{Binding XAxes}">
+        </lvc:CartesianChart>
+        <HorizontalStackLayout
+					Spacing = "25"
+					Margin="10"
+                    VerticalOptions="Start"
+                    Grid.Row="2">
+            <Button Text = "Buy"
+						Clicked="NewClick"/>
+            <Button Text = "Sell"
+						Clicked="LoadButton"/>
+            <Entry x:Name="entry"
+                   VerticalOptions="Center"
+                   Placeholder="Enter Shares"/>
+            <Switch IsToggled = "False"
+					VerticalOptions="Center"/>
+        </HorizontalStackLayout>
+        <StackLayout Grid.Column="1" Grid.RowSpan="2">
+            <SearchBar x:Name= "SearchBar"
+				   Placeholder= "Enter a Ticker Symbol"
+				   TextChanged= "OnTextChanged"
+				   WidthRequest= "400"/>
+            <ListView x:Name= "ListView"
+				  ItemSelected= "OnItemSelected"
+				  WidthRequest= "400">
+                <ListView.ItemTemplate >
+                    <DataTemplate >
+                        <TextCell Text= "{Binding Symbol}"
+						      Detail= "{Binding Name}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <ListView
+                  Grid.Column="1"
+                  Grid.Row="2"
+				  WidthRequest= "400"
+                  Margin="10">
+            </ListView>
+        </StackLayout>
+    </Grid>
 </ContentPage>
 
