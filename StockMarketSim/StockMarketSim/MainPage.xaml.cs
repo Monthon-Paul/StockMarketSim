@@ -5,8 +5,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using Microsoft.Maui.Controls;
+using Stock;
 using Newtonsoft.Json;
 
 namespace StockMarketSim;
@@ -15,13 +15,13 @@ public partial class MainPage : ContentPage {
 
 	private const string apiKey = "CN0WTTYL7GCVQ5E3";
 	private const int SearchDelay = 300;
+	Portfolio user;
 
 	private ObservableCollection<AlphaVantageSearch> Ticker { get; set; }
 
 	public MainPage() {
 		InitializeComponent();
 		Ticker = new();
-		//BindingContext = this;
 	}
 
 	/// <summary>
@@ -29,11 +29,9 @@ public partial class MainPage : ContentPage {
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
-	private void NewClick(object sender, EventArgs e) {
-		DisplayAlert("About",
-	  "Snake Game solution\n it's a full Online Multiplayer Game.\n" +
-	  "Users are allow to connect to a Snake Server \n" + "to play on a Network with other players.\n" +
-	  "Implementation by Monthon Paul\n", "OK");
+	private async void NewClick(object sender, EventArgs e) {
+		string result = await DisplayPromptAsync("Enter a Name for Portfolio", "What's your name?");
+		user = new(result);
 	}
 
 	/// <summary>
@@ -136,7 +134,7 @@ public partial class MainPage : ContentPage {
 
 	private void OnItemSelected(object sender, SelectedItemChangedEventArgs e) {
 		if (e.SelectedItem != null) {
-			var symbol = e.SelectedItem as string;
+			var symbol = e.SelectedItem as AlphaVantageSearch;
 			// Do something with the selected symbol, such as navigating to a details page.
 			ListView.SelectedItem = null;
 		}

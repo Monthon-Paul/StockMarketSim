@@ -22,8 +22,7 @@
         <HorizontalStackLayout
 					Spacing = "25"
 					Margin="10"
-                    VerticalOptions="Start"
-                    Grid.Row="0">
+                    VerticalOptions="Start">
             <Button Text = "New"
 						Clicked="NewClick"
                         x:Name="NewButton"
@@ -38,6 +37,11 @@
 						Clicked="SaveAsButton"
                         HorizontalOptions="Center"/>
         </HorizontalStackLayout>
+        <Label
+               Text="Hello world"
+               VerticalOptions="Center"
+               HorizontalOptions="Center"
+               Margin="400,0,0,0"/>
 
         <lvc:CartesianChart
                 Grid.Row="1"
@@ -70,7 +74,7 @@
                 <ListView.ItemTemplate >
                     <DataTemplate >
                         <TextCell Text= "{Binding Symbol}"
-						      Detail= "{Binding Name}" />
+						          Detail= "{Binding Name}" />
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
