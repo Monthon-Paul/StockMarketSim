@@ -30,6 +30,7 @@ public class Portfolio {
 	private Dictionary<string, int> userPortfolio;
 	[JsonProperty(PropertyName = "Versions")]
 	private string version;
+	private bool change;
 
 	// Broker buyer fee of 1% and selling fee of $10
 	private readonly decimal brokerBuyFee = 0.01m;
@@ -64,6 +65,7 @@ public class Portfolio {
 		} catch (Exception) {
 			throw new PortfolioLoadException("Trouble opening your Portfolio");
 		}
+		change = false;
 	}
 
 	/// <summary>
@@ -75,12 +77,15 @@ public class Portfolio {
 		userCashBalance = 10_000;
 		userPortfolio = new();
 		this.version = "stk";
+		change = false;
 	}
 
 	// Default Constructor
 	public Portfolio() :
 		this("Paul") {
 	}
+
+	public bool Changed { get => this.change; protected set => this.change = value; }
 
 	/// <summary>
 	/// Writes the contents of User Portfolio to the named file using a JSON format.
@@ -104,6 +109,7 @@ public class Portfolio {
 		} catch (Exception) {
 			throw new PortfolioLoadException("Problems on Saving Portfolio");
 		}
+		change = false;
 	}
 
 	/// <summary>
@@ -151,6 +157,7 @@ public class Portfolio {
 			userPortfolio[symbol] = quantity;
 		}
 		Console.WriteLine("Purchase successful!");
+		change = true;
 	}
 
 	/// <summary>
@@ -193,6 +200,7 @@ public class Portfolio {
 				userPortfolio.Remove(symbol);
 			}
 			Console.WriteLine("Sale successful!");
+			change = true;
 		} else {
 			Console.WriteLine("Insufficient shares Sold.");
 		}
