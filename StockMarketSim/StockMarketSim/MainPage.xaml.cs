@@ -11,8 +11,22 @@ using Newtonsoft.Json;
 
 namespace StockMarketSim;
 
+/// <summary>
+/// StockMarketGUI for StockMarketSim
+///
+/// This Applicaiton is to replicate the Stock Market Simulator,
+/// it's to have the basis idea of how the Stock Market works.
+/// For the program I am grabing all the Stock Data from Alpha Vantage API.
+/// The intend is it to be a small application where
+/// the User can Buy/Sell stocks to make a profit.
+/// The User can save their Portfolio into a ".stk" file in JSON format.
+///
+/// Author: Monthon Paul
+/// Version: March 24, 2022
+/// </summary>
 public partial class MainPage : ContentPage {
 
+	// Initialize variables
 	private const string apiKey = "CN0WTTYL7GCVQ5E3";
 	private const int SearchDelay = 300;
 	private string fullpath;
@@ -26,7 +40,7 @@ public partial class MainPage : ContentPage {
 	}
 
 	/// <summary>
-	/// New Button that User can click to make a New Portolio
+	/// New Button that User can click to make a New Portfolio
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
@@ -48,83 +62,78 @@ public partial class MainPage : ContentPage {
 	}
 
 	/// <summary>
-	/// About menu to display the details about the Pogram
+	/// Loat Button that the User can load their existing Stock Portfolio
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
 	private void LoadClick(object sender, EventArgs e) {
-		DisplayAlert("About",
-	  "Snake Game solution\n it's a full Online Multiplayer Game.\n" +
-	  "Users are allow to connect to a Snake Server \n" + "to play on a Network with other players.\n" +
-	  "Implementation by Monthon Paul\n", "OK");
+		//TODO: Complete Logic, don't return 
+		return;
 	}
 
 	/// <summary>
-	/// About menu to display the details about the Pogram
+	/// Save User Portfolio Progress
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
 	private void SaveClick(object sender, EventArgs e) {
-		DisplayAlert("About",
-	  "Snake Game solution\n it's a full Online Multiplayer Game.\n" +
-	  "Users are allow to connect to a Snake Server \n" + "to play on a Network with other players.\n" +
-	  "Implementation by Monthon Paul\n", "OK");
+		//TODO: Complete Logic, don't return 
+		return;
 	}
 
 	/// <summary>
-	/// About menu to display the details about the Pogram
+	/// Save User Portfolio Progress at a specific location
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
 	private void SaveDataClick(object sender, EventArgs e) {
-		DisplayAlert("About",
-	  "Snake Game solution\n it's a full Online Multiplayer Game.\n" +
-	  "Users are allow to connect to a Snake Server \n" + "to play on a Network with other players.\n" +
-	  "Implementation by Monthon Paul\n", "OK");
+		//TODO: Complete Logic, don't return 
+		return;
 	}
 
 	/// <summary>
-	/// About menu to display the details about the Pogram
+	/// About menu to display the details about the Stock Market Simulator
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
 	private void AboutClick(object sender, EventArgs e) {
-		DisplayAlert("About",
-	  "Snake Game solution\n it's a full Online Multiplayer Game.\n" +
-	  "Users are allow to connect to a Snake Server \n" + "to play on a Network with other players.\n" +
-	  "Implementation by Monthon Paul\n", "OK");
+		//TODO: Complete Logic, don't return 
+		return;
 	}
 
 	/// <summary>
-	/// Help button to display the User how to move the Snake
+	/// Help menu to display the Rules of the Stock Market Simulator
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
 	private void HTPClick(object sender, EventArgs e) {
-		DisplayAlert("Controls",
-					 "W:\t Move up\n" +
-					 "A:\t Move left\n" +
-					 "S:\t Move down\n" +
-					 "D:\t Move right\n",
-					 "OK");
+		//TODO: Complete Logic, don't return 
+		return;
 	}
 
-
-
-
+	/// <summary>
+	/// On the Search Bar, User will search either specific Ticker symbols or companies,
+	/// That will allow to display the best-matching symbols and market information based on keywords of user choice.
+	/// </summary>
+	/// <param name="sender"> Pointer to the Search Bar</param>
+	/// <param name="e"> triggle an event </param>
 	private async void OnTextChanged(object sender, EventArgs e) {
 		SearchBar searchBar = (SearchBar) sender;
 		var query = searchBar.Text;
 
+		// Connect ot API
 		string searchUrl = $"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={query}&apikey={apiKey}";
 
+		// a Delay in Search
 		await Task.Delay(SearchDelay);
 		if (!string.IsNullOrEmpty(query)) {
 			using (HttpClient client = new HttpClient()) {
 				HttpResponseMessage response = await client.GetAsync(searchUrl);
 				response.EnsureSuccessStatusCode();
 				var content = await response.Content.ReadAsStringAsync();
+				// Clear the Data Structue due to new keywords from User
 				Ticker.Clear();
+				// Parse JSON Doc in order to add info to the Data Structure
 				using (JsonDocument json = JsonDocument.Parse(content)) {
 					JsonElement root = json.RootElement;
 					JsonElement bestMatches = root.GetProperty("bestMatches");
@@ -139,19 +148,27 @@ public partial class MainPage : ContentPage {
 				}
 			}
 		} else {
+			// If the Search Bar has nothing, than no Data
 			Ticker.Clear();
 		}
 	}
 
+	// Class for Stock Data information
 	private class AlphaVantageSearch {
 		public string Symbol { get; set; }
 		public string Name { get; set; }
 	}
 
+	/// <summary>
+	/// When User Select an item on the list, the Stock Data will be display on the Graph with it's data
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="e"></param>
 	private void OnItemSelected(object sender, SelectedItemChangedEventArgs e) {
 		if (e.SelectedItem != null) {
 			var symbol = e.SelectedItem as AlphaVantageSearch;
 			// Do something with the selected symbol, such as navigating to a details page.
+			//TODO: Complete Logic
 			ListView.SelectedItem = null;
 		}
 	}

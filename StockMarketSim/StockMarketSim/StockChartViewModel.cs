@@ -7,6 +7,9 @@ using LiveChartsCore.SkiaSharpView.Maui;
 
 namespace StockMarketSim;
 
+/// <summary>
+/// Stock Data shown in Candle Stick graph
+/// </summary>
 public partial class StockChartViewModel {
 	// we have to let the chart know that the X axis in days.
 	public Axis[] XAxes { get; set; } = {
@@ -20,6 +23,8 @@ public partial class StockChartViewModel {
 		}
 	};
 
+	// Sample Data, need to change data from grabing from User Selection
+	// TODO: complete Grabing Data.
 	public ISeries[] Series { get; set; } = {
 		new CandlesticksSeries<FinancialPoint> {
 			Values = new ObservableCollection<FinancialPoint> {
