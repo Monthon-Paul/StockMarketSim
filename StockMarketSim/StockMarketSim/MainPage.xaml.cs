@@ -15,6 +15,7 @@ public partial class MainPage : ContentPage {
 
 	private const string apiKey = "CN0WTTYL7GCVQ5E3";
 	private const int SearchDelay = 300;
+	private string fullpath;
 	Portfolio user;
 
 	private ObservableCollection<AlphaVantageSearch> Ticker { get; set; }
@@ -25,13 +26,25 @@ public partial class MainPage : ContentPage {
 	}
 
 	/// <summary>
-	/// About menu to display the details about the Pogram
+	/// New Button that User can click to make a New Portolio
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
 	private async void NewClick(object sender, EventArgs e) {
-		string result = await DisplayPromptAsync("Enter a Name for Portfolio", "What's your name?");
-		user = new(result);
+		if (user.Changed) {
+			//Asks the user if they want to save or not, cancel feature so that it doesn't clear
+			string confirm = await DisplayActionSheet("Unsaved changes, Would you like to save changes?", "Cancel", null, "Yes", "No");
+			// User select Cancel does nothing
+			if (confirm is "Cancel") {
+				return;
+			} else if (confirm is "Yes") {
+				//TODO: make Logic
+			}
+			// User wants to Create a New Portfolio
+			string result = await DisplayPromptAsync("Enter a Name for Portfolio", "What's your name?");
+			if (result is null) return;
+			user = new(result);
+		}
 	}
 
 	/// <summary>
@@ -39,7 +52,7 @@ public partial class MainPage : ContentPage {
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
-	private void LoadButton(object sender, EventArgs e) {
+	private void LoadClick(object sender, EventArgs e) {
 		DisplayAlert("About",
 	  "Snake Game solution\n it's a full Online Multiplayer Game.\n" +
 	  "Users are allow to connect to a Snake Server \n" + "to play on a Network with other players.\n" +
@@ -51,7 +64,7 @@ public partial class MainPage : ContentPage {
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
-	private void SaveButton(object sender, EventArgs e) {
+	private void SaveClick(object sender, EventArgs e) {
 		DisplayAlert("About",
 	  "Snake Game solution\n it's a full Online Multiplayer Game.\n" +
 	  "Users are allow to connect to a Snake Server \n" + "to play on a Network with other players.\n" +
@@ -63,7 +76,7 @@ public partial class MainPage : ContentPage {
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
-	private void SaveAsButton(object sender, EventArgs e) {
+	private void SaveDataClick(object sender, EventArgs e) {
 		DisplayAlert("About",
 	  "Snake Game solution\n it's a full Online Multiplayer Game.\n" +
 	  "Users are allow to connect to a Snake Server \n" + "to play on a Network with other players.\n" +
@@ -75,7 +88,7 @@ public partial class MainPage : ContentPage {
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
-	private void AboutClicked(object sender, EventArgs e) {
+	private void AboutClick(object sender, EventArgs e) {
 		DisplayAlert("About",
 	  "Snake Game solution\n it's a full Online Multiplayer Game.\n" +
 	  "Users are allow to connect to a Snake Server \n" + "to play on a Network with other players.\n" +
@@ -87,7 +100,7 @@ public partial class MainPage : ContentPage {
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
-	private void HTPClicked(object sender, EventArgs e) {
+	private void HTPClick(object sender, EventArgs e) {
 		DisplayAlert("Controls",
 					 "W:\t Move up\n" +
 					 "A:\t Move left\n" +
@@ -95,6 +108,9 @@ public partial class MainPage : ContentPage {
 					 "D:\t Move right\n",
 					 "OK");
 	}
+
+
+
 
 	private async void OnTextChanged(object sender, EventArgs e) {
 		SearchBar searchBar = (SearchBar) sender;

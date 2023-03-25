@@ -9,10 +9,8 @@ namespace StockMarketSim;
 
 public partial class StockChartViewModel {
 	// we have to let the chart know that the X axis in days.
-	public Axis[] XAxes { get; set; } =
-	{
-		new Axis
-		{
+	public Axis[] XAxes { get; set; } = {
+		new Axis {
 			LabelsRotation = 15,
 			Labeler = value => new DateTime((long)value).ToString("yyyy MMM dd"),
             // set the unit width of the axis to "days"
@@ -22,13 +20,10 @@ public partial class StockChartViewModel {
 		}
 	};
 
-	public ISeries[] Series { get; set; } =
-	{
-		new CandlesticksSeries<FinancialPoint>
-		{
-			Values = new ObservableCollection<FinancialPoint>
-			{
-                //                      date, high, open, close, low
+	public ISeries[] Series { get; set; } = {
+		new CandlesticksSeries<FinancialPoint> {
+			Values = new ObservableCollection<FinancialPoint> {
+                // date, high, open, close, low
                 new(new DateTime(2021, 1, 1), 523, 500, 450, 400),
 				new(new DateTime(2021, 1, 2), 500, 450, 425, 400),
 				new(new DateTime(2021, 1, 3), 490, 425, 400, 380),
@@ -54,38 +49,3 @@ public partial class StockChartViewModel {
 		}
 	};
 }
-
-//<VerticalStackLayout Grid.Column="1" Spacing= "5"
-
-//					 Grid.RowSpan= "1" >
-
-//			< SearchBar x:Name= "SearchBar"
-//				   Placeholder= "Enter a Ticker Symbol"
-//				   TextChanged= "OnTextChanged"
-//				   WidthRequest= "400" />
-
-//			< ListView x:Name= "ListView"
-//				  ItemSelected= "OnItemSelected"
-//				  WidthRequest= "400" >
-
-//				< ListView.ItemTemplate >
-
-//					< DataTemplate >
-
-//						< TextCell Text= "{Binding Symbol}"
-//								  Detail= "{Binding Name}" />
-
-//					</ DataTemplate >
-
-//				</ ListView.ItemTemplate >
-
-//			</ ListView >
-
-//			< ListView Grid.Column= "1"
-
-//					  Grid.Row= "2"
-//				WidthRequest= "400" >
-
-//			</ ListView >
-
-//		</ VerticalStackLayout >

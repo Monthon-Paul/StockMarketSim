@@ -8,8 +8,8 @@
 
     <ContentPage.MenuBarItems>
         <MenuBarItem Text="Help">
-            <MenuFlyoutItem Text="ℹ About"  Clicked="AboutClicked" />
-            <MenuFlyoutItem Text="？How to Play" Clicked="HTPClicked" />
+            <MenuFlyoutItem Text="ℹ About"  Clicked="AboutClick" />
+            <MenuFlyoutItem Text="？How to Play" Clicked="HTPClick" />
         </MenuBarItem>
     </ContentPage.MenuBarItems>
 
@@ -23,25 +23,23 @@
 					Spacing = "25"
 					Margin="10"
                     VerticalOptions="Start">
-            <Button Text = "New"
-						Clicked="NewClick"
-                        x:Name="NewButton"
-                        HorizontalOptions="Center"/>
-            <Button Text = "Load"
-						Clicked="LoadButton"
-                        HorizontalOptions="Center"/>
-            <Button Text = "Save"
-						Clicked="SaveButton"
-                        HorizontalOptions="Center"/>
-            <Button Text = "Save As"
-						Clicked="SaveAsButton"
-                        HorizontalOptions="Center"/>
-        </HorizontalStackLayout>
-        <Label
+            <Button Text = "New Portfolio"
+					Clicked="NewClick"
+                    HorizontalOptions="Center" VerticalOptions="Center"/>
+            <Button Text = "Load Portfolio"
+					Clicked="LoadClick"
+                    HorizontalOptions="Center" VerticalOptions="Center"/>
+            <Button Text = "Save Portfolio"
+					Clicked="SaveClick"
+                    HorizontalOptions="Center" VerticalOptions="Center"/>
+            <Button Text = "Save Data"
+				    Clicked="SaveDataClick"
+                    HorizontalOptions="Center" VerticalOptions="Center"/>
+            <Label
                Text="Hello world"
                VerticalOptions="Center"
-               HorizontalOptions="Center"
-               Margin="400,0,0,0"/>
+               HorizontalOptions="Center"/>
+        </HorizontalStackLayout>
 
         <lvc:CartesianChart
                 Grid.Row="1"
@@ -53,15 +51,26 @@
 					Margin="10"
                     VerticalOptions="Start"
                     Grid.Row="2">
-            <Button Text = "Buy"
-						Clicked="NewClick"/>
-            <Button Text = "Sell"
-						Clicked="LoadButton"/>
+            <Button Text = "Buy Shares"
+					Clicked="NewClick"
+                    HorizontalOptions="Center" VerticalOptions="Center"/>
+            <Button Text = "Sell Shares"
+					Clicked="LoadButton"
+                    HorizontalOptions="Center" VerticalOptions="Center"/>
             <Entry x:Name="entry"
-                   VerticalOptions="Center"
-                   Placeholder="Enter Shares"/>
-            <Switch IsToggled = "False"
-					VerticalOptions="Center"/>
+                   Placeholder="Enter Shares"
+                   HorizontalOptions="Center" VerticalOptions="Center"/>
+            <VerticalStackLayout Spacing="5">
+                <Switch IsToggled = "False"
+                    HorizontalOptions="Center" VerticalOptions="Center"/>
+                <Label
+                    Text="Broker's fee"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+            <Button Text = "Change Name"
+					Clicked="LoadButton"
+                    HorizontalOptions="Center" VerticalOptions="Center"/>
         </HorizontalStackLayout>
         <StackLayout Grid.Column="1" Grid.RowSpan="2">
             <SearchBar x:Name= "SearchBar"
