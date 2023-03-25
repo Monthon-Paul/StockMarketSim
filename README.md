@@ -1,13 +1,13 @@
 # Stock Market Simulator
 Authors: Monthon Paul
 
-Current Version: 1.0
+Current Version: Working Progress
 
-Last Updated: 03/12/2023
+Last Updated: 03/24/2023
 
 # Purpose: 
 
-This Applicaiton is to replicate the Stock Market Simulator Application, it's to have the basis idea of how 
+This Applicaiton is to replicate the Stock Market Simulator, it's to have the basis idea of how 
 the Stock Market works. For the program I am grabing all the Stock Data from Alpha Vantage API. The intend is it to be a small application where 
 the User can Buy/Sell stocks to make a profit. The User can save their process into a ".stk" in JSON format, example being "stock.stk"
 
@@ -17,8 +17,11 @@ For more details, please look in the "About"/"How to Use" in the help tab.
 - [x] Finish Model Logic
 - [x] Add a serch bar for tinker search
 - [x] Add a Stock Market Chart UI
+- [ ] Add Logic in Buttons & menu
+- [ ] Connect Model & View
+- [ ] Connect Ticker Search inot Stock Chart UI
 - [ ] Build the Application
-- [ ] add extra features like Short seling
+- [ ] add extra features like Short selling (later)
  
 # How the StockMarketSim works:
 Users will start with a balance of $10,000 where they can play the game in order to make profit or lose profit. It's a simulator so the User can have experience learning how the Stock Market works and should learn how it works.
