@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using System.Threading.Channels;
+using Microsoft.Extensions.Configuration;
 
 namespace Stock;
 
@@ -36,6 +37,9 @@ public class Portfolio {
 	private readonly decimal brokerBuyFee = 0.01m;
 	private readonly decimal brokerSellFee = 10;
 	private bool broker = false;
+
+
+
 
 	/// <summary>
 	/// 2 args Contructor for Portfolio
@@ -264,7 +268,7 @@ public class Portfolio {
 	/// <param name="symbol">Stock Ticker Symbol</param>
 	/// <returns> StockData </returns>
 	private static async Task<StockData> GetStockData(string symbol) {
-		string apiKey = "CN0WTTYL7GCVQ5E3";
+		string apiKey = GetAPIKey();
 		string apiUrl = $"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={apiKey}";
 
 		using (HttpClient client = new HttpClient()) {
@@ -290,6 +294,18 @@ public class Portfolio {
 				return stockData;
 			}
 		}
+	}
+
+	/// <summary>
+	/// Get Alpha Vantage API key
+	/// </summary>
+	/// <returns> string representation for Alpha Vantage API key</returns>
+	private static string GetAPIKey() {
+		// Create an instance of IConfiguration
+		var config = new ConfigurationBuilder()
+			.AddUserSecrets<Portfolio>()
+			.Build();
+		return config["apiKey"];
 	}
 
 	/// <summary>
