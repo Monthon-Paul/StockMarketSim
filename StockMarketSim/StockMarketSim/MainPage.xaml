@@ -55,7 +55,7 @@
 					Clicked="NewClick"
                     HorizontalOptions="Center" VerticalOptions="Center"/>
             <Button Text = "Sell Shares"
-					Clicked="LoadButton"
+					Clicked="LoadClick"
                     HorizontalOptions="Center" VerticalOptions="Center"/>
             <Entry x:Name="entry"
                    Placeholder="Enter Shares"
@@ -69,7 +69,7 @@
                     HorizontalOptions="Center"/>
             </VerticalStackLayout>
             <Button Text = "Change Name"
-					Clicked="LoadButton"
+					Clicked="LoadClick"
                     HorizontalOptions="Center" VerticalOptions="Center"/>
         </HorizontalStackLayout>
         <StackLayout Grid.Column="1" Grid.RowSpan="2">

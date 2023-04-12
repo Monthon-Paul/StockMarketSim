@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
 using Stock;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace StockMarketSim;
 
@@ -27,7 +28,6 @@ namespace StockMarketSim;
 public partial class MainPage : ContentPage {
 
 	// Initialize variables
-	private const string apiKey = "CN0WTTYL7GCVQ5E3";
 	private const int SearchDelay = 300;
 	private string fullpath;
 	Portfolio user;
@@ -122,6 +122,7 @@ public partial class MainPage : ContentPage {
 		var query = searchBar.Text;
 
 		// Connect ot API
+		string apiKey = GetAPIKey();
 		string searchUrl = $"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={query}&apikey={apiKey}";
 
 		// a Delay in Search
@@ -151,6 +152,18 @@ public partial class MainPage : ContentPage {
 			// If the Search Bar has nothing, than no Data
 			Ticker.Clear();
 		}
+	}
+
+	/// <summary>
+	/// Get Alpha Vantage API key
+	/// </summary>
+	/// <returns> string representation for Alpha Vantage API key</returns>
+	private static string GetAPIKey() {
+		// Create an instance of IConfiguration
+		var config = new ConfigurationBuilder()
+			.AddUserSecrets<Portfolio>()
+			.Build();
+		return config["apiKey"];
 	}
 
 	// Class for Stock Data information
