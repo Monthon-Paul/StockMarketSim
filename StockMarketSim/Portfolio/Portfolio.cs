@@ -18,13 +18,13 @@ namespace Stock;
 /// </summary>
 /// 
 /// Author: Monthon Paul
-/// Version: March 9 2023
+/// Version: May 5 2023
 [JsonObject(MemberSerialization.OptIn)]
 public class Portfolio {
 
 	// Initialize variables
 	[JsonProperty(PropertyName = "Name")]
-	public string name { get; }
+	public string name { get; set; }
 	[JsonProperty(PropertyName = "CashBalance")]
 	public decimal userCashBalance { get; private set; }
 	[JsonProperty(PropertyName = "Shares")]
@@ -37,9 +37,6 @@ public class Portfolio {
 	private readonly decimal brokerBuyFee = 0.01m;
 	private readonly decimal brokerSellFee = 10;
 	private bool broker = false;
-
-
-
 
 	/// <summary>
 	/// 2 args Contructor for Portfolio
@@ -69,7 +66,7 @@ public class Portfolio {
 		} catch (Exception) {
 			throw new PortfolioLoadException("Trouble opening your Portfolio");
 		}
-		change = false;
+		change = true;
 	}
 
 	/// <summary>
@@ -81,7 +78,7 @@ public class Portfolio {
 		userCashBalance = 10_000;
 		userPortfolio = new();
 		this.version = "stk";
-		change = false;
+		change = true;
 	}
 
 	// Default Constructor
@@ -103,17 +100,35 @@ public class Portfolio {
 	/// PortfolioLoadException with an explanatory message.
 	/// </summary>
 	/// <param name="filename">file name being save as</param>
-	/// <exception cref="PortfolioLoadException">Throws an exception if the Spreadsheet fail to save</exception>
+	/// <exception cref="PortfolioLoadException">Throws an exception if the Portfoliio fails to save</exception>
 	public void Save(string filename) {
 		// try to save the User Portfolio as a file
 		try {
 			string json = JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
-
+			change = false;
 			File.WriteAllText(filename, json);
 		} catch (Exception) {
 			throw new PortfolioLoadException("Problems on Saving Portfolio");
 		}
+	}
+
+	/// <summary>
+	/// Writes the contents of User Portfolio JSON format string.
+	/// The JSON object should have the following fields:
+	/// "Version" - the version ending in stk
+	/// "Name" - Name of the Portfolio
+	/// "CashBalance" - Amount of money the user have
+	/// "Shares" - in a Dictionary, key value of stock company matches to amount of shares the User have
+	/// 
+	/// If there are any problems opening, the method should throw a
+	/// PortfolioLoadException with an explanatory message.
+	/// </summary>
+	/// <exception cref="PortfolioLoadException">Throws an exception if the Spreadsheet fails to save</exception>
+	public string Save() {
+		// Write the User Portfolio as a JSON String
+		string json = JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
 		change = false;
+		return json;
 	}
 
 	/// <summary>
@@ -342,4 +357,3 @@ public class Portfolio {
 		}
 	}
 }
-
