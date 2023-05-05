@@ -3,7 +3,7 @@ Authors: Monthon Paul
 
 Current Version: Working Progress
 
-Last Updated: 03/24/2023
+Last Updated: 05/05/2023
 
 # Purpose: 
 
@@ -17,9 +17,9 @@ For more details, please look in the "About"/"How to Use" in the help tab.
 - [x] Finish Model Logic
 - [x] Add a serch bar for tinker search
 - [x] Add a Stock Market Chart UI
-- [ ] Add Logic in Buttons & menu
+- [X] Add Logic in Buttons & menu
 - [ ] Connect Model & View
-- [ ] Connect Ticker Search inot Stock Chart UI
+- [ ] Connect Ticker Search into Stock Chart UI
 - [ ] Build the Application
 - [ ] add extra features like Short selling (later)
  
