@@ -22,25 +22,31 @@
         <HorizontalStackLayout
 					Spacing = "25"
 					Margin="10"
-                    VerticalOptions="Start">
+                    VerticalOptions="Center">
             <Button Text = "New Portfolio"
 					Clicked="NewClick"
                     HorizontalOptions="Center" VerticalOptions="Center"/>
             <Button Text = "Load Portfolio"
 					Clicked="LoadClick"
                     HorizontalOptions="Center" VerticalOptions="Center"/>
-            <Button Text = "Save Portfolio"
-					Clicked="SaveClick"
+            <Button x:Name="SavePort"
+                    Text = "Quick Save"
+					Clicked="QuickSaveClick"
+                    IsEnabled="False"
                     HorizontalOptions="Center" VerticalOptions="Center"/>
-            <Button Text = "Save Data"
-				    Clicked="SaveDataClick"
+            <Button x:Name="SaveData"
+                    Text = "Save Portfolio"
+				    Clicked="SaveClick"
+                    IsEnabled="False"
                     HorizontalOptions="Center" VerticalOptions="Center"/>
             <Label
-               Text="Hello world"
+               x:Name="LabelUser"
+               Text="Portfolio Name:"
                VerticalOptions="Center"
-               HorizontalOptions="Center"/>
+               HorizontalOptions="Center"
+               VerticalTextAlignment="Center"
+               HorizontalTextAlignment="Center" FontSize="Body"/>
         </HorizontalStackLayout>
-
         <lvc:CartesianChart
                 Grid.Row="1"
                 Series="{Binding Series}"
@@ -49,27 +55,36 @@
         <HorizontalStackLayout
 					Spacing = "25"
 					Margin="10"
-                    VerticalOptions="Start"
+                    VerticalOptions="Center"
                     Grid.Row="2">
-            <Button Text = "Buy Shares"
+            <Button x:Name="Buy"
+                    Text = "Buy Shares"
 					Clicked="NewClick"
+                    IsEnabled="False"
                     HorizontalOptions="Center" VerticalOptions="Center"/>
-            <Button Text = "Sell Shares"
+            <Button x:Name="Sell"
+                    Text = "Sell Shares"
 					Clicked="LoadClick"
+                    IsEnabled="False"
                     HorizontalOptions="Center" VerticalOptions="Center"/>
-            <Entry x:Name="entry"
+            <Entry x:Name="Entry"
                    Placeholder="Enter Shares"
+                   IsEnabled="False"
                    HorizontalOptions="Center" VerticalOptions="Center"/>
             <VerticalStackLayout Spacing="5">
-                <Switch IsToggled = "False"
+                <Switch x:Name="Broker"
+                    IsToggled = "False"
+                    IsEnabled="False"
                     HorizontalOptions="Center" VerticalOptions="Center"/>
                 <Label
                     Text="Broker's fee"
                     VerticalOptions="Center"
                     HorizontalOptions="Center"/>
             </VerticalStackLayout>
-            <Button Text = "Change Name"
-					Clicked="LoadClick"
+            <Button x:Name="Change"
+                    Text = "Change Name"
+					Clicked="ChangeClick"
+                    IsEnabled="False"
                     HorizontalOptions="Center" VerticalOptions="Center"/>
         </HorizontalStackLayout>
         <StackLayout Grid.Column="1" Grid.RowSpan="2">

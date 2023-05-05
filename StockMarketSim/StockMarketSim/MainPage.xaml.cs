@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Maui.Controls;
-using Stock;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
+using CommunityToolkit.Maui.Storage;
+using Stock;
 
 namespace StockMarketSim;
 
@@ -23,20 +21,22 @@ namespace StockMarketSim;
 /// The User can save their Portfolio into a ".stk" file in JSON format.
 ///
 /// Author: Monthon Paul
-/// Version: March 24, 2022
+/// Version: May 5, 2023
 /// </summary>
 public partial class MainPage : ContentPage {
 
 	// Initialize variables
 	private const int SearchDelay = 300;
 	private string fullpath;
-	Portfolio user;
+	private Portfolio user;
+	private IFileSaver fileSaver;
 
 	private ObservableCollection<AlphaVantageSearch> Ticker { get; set; }
 
-	public MainPage() {
+	public MainPage(IFileSaver fileSaver) {
 		InitializeComponent();
 		Ticker = new();
+		this.fileSaver = fileSaver;
 	}
 
 	/// <summary>
@@ -45,20 +45,38 @@ public partial class MainPage : ContentPage {
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
 	private async void NewClick(object sender, EventArgs e) {
-		if (user.Changed) {
-			//Asks the user if they want to save or not, cancel feature so that it doesn't clear
+		// First check if there is a Portfolio, then Checks if the Portfoliio has been changed
+		if (user is null) {
+			goto CreateNew;
+		} else if (user.Changed) {
+			//Asks the user if they want to save or not, cancel feature so the it doesn't change user
 			string confirm = await DisplayActionSheet("Unsaved changes, Would you like to save changes?", "Cancel", null, "Yes", "No");
 			// User select Cancel does nothing
 			if (confirm is "Cancel") {
 				return;
 			} else if (confirm is "Yes") {
-				//TODO: make Logic
+				// checks if there is already a saved path, to just quickly save
+				if (File.Exists(fullpath)) {
+					QuickSaveClick(sender, e);
+					goto CreateNew;
+				}
+				try {
+					using var stream = new MemoryStream(Encoding.Default.GetBytes(user.Save()));
+					await fileSaver.SaveAsync($"{user.name}.stk", stream, default);
+				} catch (Exception) {
+					await DisplayAlert("Fail to Save", "Please enter a valid path to save your file, nothing is going to change.", "OK");
+					return;
+				}
 			}
-			// User wants to Create a New Portfolio
-			string result = await DisplayPromptAsync("Enter a Name for Portfolio", "What's your name?");
-			if (result is null) return;
-			user = new(result);
 		}
+		// User wants to Create a New Portfolio
+		CreateNew:
+		string name = await DisplayPromptAsync("Enter a Name for Portfolio", "What's your name?");
+		if (name is null) return;
+		user = new(name);
+		fullpath = "";
+		LabelUser.Text = $"Portfolio Name: {user.name}";
+		SavePort.IsEnabled = SaveData.IsEnabled = Buy.IsEnabled = Sell.IsEnabled = Entry.IsEnabled = Broker.IsEnabled = Change.IsEnabled = true;
 	}
 
 	/// <summary>
@@ -66,19 +84,71 @@ public partial class MainPage : ContentPage {
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
-	private void LoadClick(object sender, EventArgs e) {
-		//TODO: Complete Logic, don't return 
-		return;
+	private async void LoadClick(object sender, EventArgs e) {
+		// First check if there is a Portfolio, then Checks if the Portfoliio has been changed
+		if (user is null) {
+			goto LoadFile;
+		} else if (user.Changed) {
+			//Asks the user if they want to save or not, cancel feature so the it doesn't change user
+			string confirm = await DisplayActionSheet("Unsaved changes, Would you like to save changes?", "Cancel", null, "Yes", "No");
+			// User select Cancel does nothing
+			if (confirm is "Cancel") {
+				return;
+			} else if (confirm is "Yes") {
+				// checks if there is already a saved path, to just quickly save
+				if (File.Exists(fullpath)) {
+					QuickSaveClick(sender, e);
+					goto LoadFile;
+				}
+				try {
+					// Save file that the User can choose where
+					using var stream = new MemoryStream(Encoding.Default.GetBytes(user.Save()));
+					await fileSaver.SaveAsync($"{user.name}.stk", stream, default);
+				} catch (Exception) {
+					await DisplayAlert("Fail to Save", "Please enter a valid path to save your file, nothing is going to change.", "OK");
+					return;
+				}
+			}
+		}
+		// Open Loaded Portfolio file
+		LoadFile:
+		try {
+			//Grabs the name of the file
+			var fileResult = await FilePicker.PickAsync();
+			// Makes sure that there is a name for the file or that the file open ends with ".stk"
+			// Otherwise don't change Portfolio
+			if (fileResult != null) {
+				if (!fileResult.FileName.EndsWith("stk")) throw new Exception();
+				fullpath = fileResult.FullPath;
+				user = new(fullpath, "stk");
+			} else {
+				//If the User dosen't select any file
+				Console.WriteLine("No file selected.");
+			}
+		} catch (Exception ex) {
+			Console.WriteLine("Error opening file:");
+			await DisplayAlert("Error Opening File", "Please open a file ending in \".stk\"", "OK");
+			Console.WriteLine(ex);
+		}
+		LabelUser.Text = $"Portfolio Name: {user.name}";
+		SavePort.IsEnabled = SaveData.IsEnabled = Buy.IsEnabled = Sell.IsEnabled = Entry.IsEnabled = Broker.IsEnabled = Change.IsEnabled = true;
 	}
 
 	/// <summary>
-	/// Save User Portfolio Progress
+	/// Quick Save User Portfolio Progress
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
-	private void SaveClick(object sender, EventArgs e) {
-		//TODO: Complete Logic, don't return 
-		return;
+	private void QuickSaveClick(object sender, EventArgs e) {
+		//Takes the already save path and update the Portfolio
+		if (user is null) return;
+		if (user.Changed) {
+			if (!File.Exists(fullpath)) {
+				SaveClick(sender, e);
+				return;
+			}
+			user.Save(fullpath);
+		}
 	}
 
 	/// <summary>
@@ -86,9 +156,31 @@ public partial class MainPage : ContentPage {
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
-	private void SaveDataClick(object sender, EventArgs e) {
-		//TODO: Complete Logic, don't return 
-		return;
+	private async void SaveClick(object sender, EventArgs e) {
+		// First check if there is a Portfolio, then Checks if the Portfoliio has been changed
+		if (user is null) {
+			return;
+		} else if (user.Changed) {
+			SaveAgain:
+			// checks if there is already a saved path, to just quickly save
+			if (File.Exists(fullpath)) {
+				QuickSaveClick(sender, e);
+				return;
+			}
+			try {
+				// Save file that the User can choose where
+				using var stream = new MemoryStream(Encoding.Default.GetBytes(user.Save()));
+				var path = await fileSaver.SaveAsync($"{user.name}.stk", stream, default);
+
+				fullpath = path.FilePath;
+			} catch (Exception) {
+				// Ask the User if the wanting to Save again because of in valid path
+				if (await DisplayAlert("Fail to Save", "Please enter a valid path to save your file, " +
+					"Do you want to save again?", "Yes", "Cancel")) {
+					goto SaveAgain;
+				}
+			}
+		}
 	}
 
 	/// <summary>
@@ -109,6 +201,18 @@ public partial class MainPage : ContentPage {
 	private void HTPClick(object sender, EventArgs e) {
 		//TODO: Complete Logic, don't return 
 		return;
+	}
+
+	/// <summary>
+	/// Change the User Portfolio name
+	/// </summary>
+	/// <param name="sender">Pointer to the Button</param>
+	/// <param name="e">triggle an event</param>
+	private async void ChangeClick(object sender, EventArgs e) {
+		string name = await DisplayPromptAsync("Enter a Name for Portfolio", "Change Portfolio Name?");
+		if (name is null) return;
+		user.name = name;
+		LabelUser.Text = $"Portfolio User: {user.name}";
 	}
 
 	/// <summary>
