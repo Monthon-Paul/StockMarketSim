@@ -57,7 +57,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
-		<PackageReference Include="LiveChartsCore.SkiaSharpView.Maui" Version="2.0.0-beta.701" />
+		<PackageReference Include="LiveChartsCore.SkiaSharpView.Maui" Version="2.0.0-beta.710" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="5.1.0" />

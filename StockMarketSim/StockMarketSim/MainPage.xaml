@@ -45,7 +45,7 @@
                VerticalOptions="Center"
                HorizontalOptions="Center"
                VerticalTextAlignment="Center"
-               HorizontalTextAlignment="Center" FontSize="Body"/>
+               HorizontalTextAlignment="Center" FontSize="Header"/>
         </HorizontalStackLayout>
         <lvc:CartesianChart
                 Grid.Row="1"
