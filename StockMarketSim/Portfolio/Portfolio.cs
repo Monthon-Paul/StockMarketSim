@@ -86,7 +86,7 @@ public class Portfolio {
 		this("Paul") {
 	}
 
-	public bool Changed { get => this.change; protected set => this.change = value; }
+	public bool Changed { get => this.change; set => this.change = value; }
 
 	/// <summary>
 	/// Writes the contents of User Portfolio to the named file using a JSON format.
