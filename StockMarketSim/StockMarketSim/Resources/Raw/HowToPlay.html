@@ -1,0 +1,234 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        :root {
+            --ion-color-primary: rgb(0, 255, 0);
+            --ion-color-secondary: rgb(255, 0, 0);
+        }
+
+        body {
+            font-size: 100%;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        title {
+            font-size: 1.2em;
+        }
+
+        h2 {
+            font-size: 1.0em;
+        }
+
+        p {
+            width: 400px;
+        }
+
+        ol {
+            width: 400px;
+        }
+
+        li {
+            padding-top: 5px;
+        }
+
+        .category {
+            padding-top: 5px;
+        }
+
+        .FunctionItem {
+            padding-left: 20px;
+            padding-top: 10px;
+        }
+
+        .description {
+            padding-left: 20px;
+            padding-top: 5px;
+        }
+
+        .listExample {
+            padding-left: 20px;
+            padding-top: 5px;
+            font-family: monospace;
+        }
+
+        ion-icon {
+            font-size: 16px;
+        }
+    </style>
+
+    <meta charset="utf-8" />
+    <title>How to Play:</title>
+</head>
+<body>
+    <section class="category">
+        <h2>Top Section:</h2>
+        <div class="FunctionItem">
+            <b>New Portfolio:</b>
+            <div class="description">
+                <p>
+                    Creates a new Portfolio for the User. If there is Unsave changes,
+                    it will ask the User (you) want to save. "Yes" will ask you to name it,
+                    Saving the file will create a new file. Otherwise if it does exist, it updates the pre-existing file.
+                    "No" will creates new Portfolio without saving.
+                </p>
+            </div>
+        </div>
+
+        <div class="FunctionItem">
+            <b>Load Portfolio:</b>
+            <div class="description">
+                <p>
+                    Loads in an already saved Portfolio for the User. To open a file, it should end in ".stk" for this Program.
+                    If the Portfolio has unsave changes, it will ask if you want to save. "Yes" will ask you to name it,
+                    Saving the file will create a new file. Otherwise if it already exist, it updates the pre-existing file. "No" will discard it changes.
+                    Otherwise, Loads in a Portfolio for the User.
+                </p>
+            </div>
+        </div>
+
+        <div class="FunctionItem">
+            <b>Quick Save:</b>
+            <div class="description">
+                <p>
+                    Saves the Portfolio.
+                    If it already exist,
+                    quickly save the contents & update the file.
+                    Otherwise, same feature as Save Portfolio.
+                </p>
+            </div>
+        </div>
+
+        <div class="FunctionItem">
+            <b>Save Portfolio:</b>
+            <div class="description">
+                <p>
+                    Let the User (you) save the Portfolio at a specific location.
+                    it'll then create a new saved file.
+                </p>
+            </div>
+        </div>
+
+        <div class="FunctionItem">
+            <b>Search Bar:</b>
+            <div class="description">
+                <p>
+                    Allow the User to search for the any company with the name or Ticker symbol.
+                    After they choosen the Ticker. The graph will display the history of the Stocks price for Ticker symbol
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="category">
+        <h2>Bottom Section:</h2>
+
+        <div class="FunctionItem">
+            <b>Buy Shares:</b>
+            <div class="description">
+                <p>
+                    Allow the User to Buy shares from the Ticker Symbol they have choosen
+                    that is display in the graph. Only allow the User to Buy more than 10 Shares, Otherwise the transaction
+                    won't be completed. If the User doesn't have enough balance to buy, the transaction will also won't be completed.
+                </p>
+            </div>
+        </div>
+
+        <div class="FunctionItem">
+            <b>Sell Shares:</b>
+            <div class="description">
+                <p>
+                    Allow the User to Sell shares from the Ticker Symbol they have choosen
+                    that is display in the graph. If the User doesn't have any Ticker Symbol Shares,
+                    the transaction won't be completed.
+                </p>
+            </div>
+        </div>
+
+        <div class="FunctionItem">
+            <b>Enter Shares:</b>
+            <div class="description">
+                <p>
+                    Provides the User to enter the amount of Shares in-order to Buy/Sell. Can't
+                    enter in a negative or 0 number, the transaction is allow if the User Portfolio have the balance.
+                </p>
+            </div>
+        </div>
+
+        <div class="FunctionItem">
+            <b>Broker's' Fee:</b>
+            <div class="description">
+                <p>
+                    An Option for the User if they want to turn on Broker's Fee.
+                    For Buy: Broker's Fee is 1% of the amount total cost fee from Shares
+                    For Sell: Broker's Fee is $10 from the total amount of Selling Shares
+                </p>
+            </div>
+        </div>
+
+        <div class="FunctionItem">
+            <b>Change Name:</b>
+            <div class="description">
+                <p>
+                    Allow the User to change their Portfolio Name.
+                    Then allow the User to update Portfolio name file, if not,
+                    the Portfolio name is changed.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="category">
+        <h2>Help:</h2>
+
+        <div class="FunctionItem">
+            <b>About:</b>
+            <div class="description">
+                <p>
+                    This provides information about the explanation
+                    overview of the Program, updates, Versioning, and Author for the program.
+                </p>
+            </div>
+        </div>
+
+        <div class="FunctionItem">
+            <b>How to Use:</b>
+            <div class="description">
+                <p>
+                    This provides information on it's feature & how to play
+                    the Stock Markete Simulator.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="category">
+        <h2>GUI Properties:</h2>
+
+        <div class="FunctionItem">
+            <b>Graph:</b>
+            <div class="description">
+                <p>
+                    The middle Graph provide for the User to display the details of
+                    daily open/high/low/close/volume values, daily adjusted close values,
+                    and historical split/dividend events of the global equity specified from the User
+                    choosen Ticker Symbol.
+                </p>
+            </div>
+        </div>
+        <div class="FunctionItem">
+            <b>Ticker Search</b>
+            <div class="description">
+                <p>
+                    The Ticker Search feature is for the User to search for a specific Company by Name or Ticker
+                    to allow the User to Choose the company in order to be display in the graph displaying the Stock's history.
+                    Allow the User to make the assumption in order to Buy/Sell.
+                </p>
+            </div>
+        </div>
+    </section>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

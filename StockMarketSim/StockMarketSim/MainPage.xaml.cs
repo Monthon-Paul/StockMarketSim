@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
 using CommunityToolkit.Maui.Storage;
 using Stock;
+using CommunityToolkit.Maui.Views;
 
 namespace StockMarketSim;
 
@@ -195,8 +196,39 @@ public partial class MainPage : ContentPage {
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
 	private void AboutClick(object sender, EventArgs e) {
-		//TODO: Complete Logic, don't return 
-		return;
+		// Load HTML format for information
+		string HTML = LoadHtml("About.html");
+		// Add a button functions, i.e close popup
+		Button button = new Button {
+			Text = "Close",
+			VerticalOptions = LayoutOptions.Center,
+			HorizontalOptions = LayoutOptions.Center,
+			WidthRequest = 500,
+			HeightRequest = 50,
+			BackgroundColor = new Color(245, 245, 245)
+		};
+
+		// Display a Popup displaying "about" the Program
+		Popup about = new Popup() {
+			CanBeDismissedByTappingOutsideOfPopup = true,
+			Size = new Size(500, 500),
+			Content = new StackLayout {
+				BackgroundColor = new Color(255, 255, 255),
+				Children = {
+					//Using  HTML format for information
+					new WebView {
+						HeightRequest= 450,
+						Source = new HtmlWebViewSource {
+							Html = HTML
+						}
+					},
+					button, // show button
+				}
+			}
+		};
+		// Event to trigger the close of the popup
+		button.Clicked += (sender, args) => about.Close();
+		this.ShowPopup(about);
 	}
 
 	/// <summary>
@@ -205,8 +237,38 @@ public partial class MainPage : ContentPage {
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
 	private void HTPClick(object sender, EventArgs e) {
-		//TODO: Complete Logic, don't return 
-		return;
+		// Load HTML format for information
+		string HTML = LoadHtml("HowToPlay.html");
+		// Add a button functions, i.e close popup
+		Button button = new Button {
+			Text = "Close",
+			VerticalOptions = LayoutOptions.Center,
+			HorizontalOptions = LayoutOptions.Center,
+			WidthRequest = 520,
+			HeightRequest = 50,
+			BackgroundColor = new Color(245, 245, 245) // Whitesmoke
+		};
+
+		// Display a Popup displaying "How to Play" the Program
+		Popup HTP = new Popup() {
+			CanBeDismissedByTappingOutsideOfPopup = true,
+			Size = new Size(520, 700),
+			Content = new StackLayout {
+				BackgroundColor = new Color(255, 255, 255), // White
+				Children = {
+					//Using  HTML format for information
+					new WebView {
+						HeightRequest= 650,
+						Source = new HtmlWebViewSource {
+							Html = HTML
+						}
+					},
+					button, // show button
+				}
+			}
+		};
+		button.Clicked += (sender, args) => HTP.Close();
+		this.ShowPopup(HTP);
 	}
 
 	/// <summary>
@@ -232,10 +294,24 @@ public partial class MainPage : ContentPage {
 	}
 
 	/// <summary>
-	/// 
+	/// Load the HTML file located in "Resources/Raw/**"
+	/// Using StreamReader, locate the html file in system then read the file
+	/// to save onto a string.
 	/// </summary>
-	/// <param name="filePath"></param>
-	/// <param name="newName"></param>
+	/// <param name="html">Specifc file for html opening</param>
+	private string LoadHtml(string html) {
+		using var stream = FileSystem.OpenAppPackageFileAsync(html);
+		using var reader = new StreamReader(stream.Result);
+
+		string HTML = reader.ReadToEnd();
+		return HTML;
+	}
+
+	/// <summary>
+	/// Rename a specific file due to the name change from the User to their Portfolio
+	/// </summary>
+	/// <param name="filePath"> filepath of the User Portfolio </param>
+	/// <param name="newName"> New name for the User Portfolio </param>
 	private void RenameFile(string filePath, string newName) {
 		string directory = Path.GetDirectoryName(filePath);
 		string fileName = Path.GetFileNameWithoutExtension(filePath);
