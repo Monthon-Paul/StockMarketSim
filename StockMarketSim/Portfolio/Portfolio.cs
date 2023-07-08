@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using System.Threading.Channels;
 using Microsoft.Extensions.Configuration;
+using System.Globalization;
 
 namespace Stock;
 
@@ -274,7 +275,6 @@ public class Portfolio {
 		public decimal Low { get; set; }
 		public decimal Price { get; set; }
 		public DateTime Date { get; set; }
-		public string Percent { get; set; }
 	}
 
 	/// <summary>
@@ -285,6 +285,7 @@ public class Portfolio {
 	private static async Task<StockData> GetStockData(string symbol) {
 		string apiKey = GetAPIKey();
 		string apiUrl = $"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={apiKey}";
+		string format = "yyyy-MM-dd";
 
 		using (HttpClient client = new HttpClient()) {
 			HttpResponseMessage response = await client.GetAsync(apiUrl);
@@ -300,8 +301,7 @@ public class Portfolio {
 					High = Convert.ToDecimal(globalQuote.GetProperty("03. high").GetString()),
 					Low = Convert.ToDecimal(globalQuote.GetProperty("04. low").GetString()),
 					Price = Convert.ToDecimal(globalQuote.GetProperty("05. price").GetString()),
-					Date = DateFormat(globalQuote.GetProperty("07. latest trading day").GetString()),
-					Percent = globalQuote.GetProperty("10. change percent").GetString()
+					Date = DateTime.ParseExact(globalQuote.GetProperty("07. latest trading day").GetString(), format, CultureInfo.InvariantCulture),
 				};
 
 				//await Task.Delay(1000);
@@ -321,16 +321,6 @@ public class Portfolio {
 			.AddUserSecrets<Portfolio>()
 			.Build();
 		return config["apiKey"];
-	}
-
-	/// <summary>
-	/// Changes Stock Data format to DateTime
-	/// </summary>
-	/// <param name="date">data string</param>
-	/// <returns></returns>
-	private static DateTime DateFormat(string date) {
-		string[] arr = date.Split('-');
-		return new DateTime(int.Parse(arr[0]), int.Parse(arr[1]), int.Parse(arr[2]));
 	}
 
 	/// <summary>
