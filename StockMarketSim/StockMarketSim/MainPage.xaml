@@ -17,7 +17,7 @@
         <local:StockChartViewModel/>
     </ContentPage.BindingContext>
     <Grid ColumnDefinitions = "2*, *"
-          RowDefinitions="75, *, 75"
+          RowDefinitions="75, 50, *, 75"
           RowSpacing="5">
         <HorizontalStackLayout
 					Spacing = "25"
@@ -47,8 +47,56 @@
                VerticalTextAlignment="Center"
                HorizontalTextAlignment="Center" FontSize="Header"/>
         </HorizontalStackLayout>
+        <VerticalStackLayout
+			Margin="10,0,0,0"
+            VerticalOptions="Center"
+            Grid.Row="1">
+            <HorizontalStackLayout
+                Spacing = "10"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                Margin="0,3">
+                <Label
+                    x:Name="StockTinker"
+                    FontSize="Medium"/>
+                <Label
+                    x:Name="StockName"
+                    FontSize="Medium"/>
+            </HorizontalStackLayout>
+            <HorizontalStackLayout
+                Spacing = "25"
+                VerticalOptions="Center">
+                <Label
+                    x:Name="StockPrice"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    FontSize="Title"/>
+                <Frame
+                    x:Name="Background"
+                    CornerRadius="10"
+                    Padding="10,5"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
+                    BorderColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}">
+                    <Label
+                        x:Name="StockPercent"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"
+                        FontSize="Header"/>
+                </Frame>
+                <Label
+                    x:Name="StockChange"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    FontSize="Large"/>
+                <Label
+                    x:Name="StockDate"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    FontSize="Large"/>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
         <lvc:CartesianChart
-                Grid.Row="1"
+                Grid.Row="2"
                 Series="{Binding Series}"
                 XAxes="{Binding XAxes}">
         </lvc:CartesianChart>
@@ -56,10 +104,10 @@
 					Spacing = "25"
 					Margin="10"
                     VerticalOptions="Center"
-                    Grid.Row="2">
+                    Grid.Row="3">
             <Button x:Name="Buy"
                     Text = "Buy Shares"
-					Clicked="NewClick"
+					Clicked="BuyClick"
                     IsEnabled="False"
                     HorizontalOptions="Center" VerticalOptions="Center"/>
             <Button x:Name="Sell"
@@ -87,10 +135,10 @@
                     IsEnabled="False"
                     HorizontalOptions="Center" VerticalOptions="Center"/>
         </HorizontalStackLayout>
-        <StackLayout Grid.Column="1" Grid.RowSpan="2">
+        <StackLayout Grid.Column="1" Grid.RowSpan="3">
             <SearchBar x:Name= "SearchBar"
-				   Placeholder= "Enter a Ticker Symbol"
-				   TextChanged= "OnTextChanged"
+				   Placeholder= "Enter a Ticker Symbol or Company Name"
+                   SearchButtonPressed= "Search"
 				   WidthRequest= "400"/>
             <ListView x:Name= "ListView"
 				  ItemSelected= "OnItemSelected"
@@ -104,7 +152,7 @@
             </ListView>
             <ListView
                   Grid.Column="1"
-                  Grid.Row="2"
+                  Grid.Row="3"
 				  WidthRequest= "400"
                   Margin="10">
             </ListView>

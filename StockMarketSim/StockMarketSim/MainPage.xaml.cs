@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Microsoft.Extensions.Configuration;
 using CommunityToolkit.Maui.Storage;
-using Stock;
 using CommunityToolkit.Maui.Views;
+using Stock;
+using System.Threading.Channels;
 
 namespace StockMarketSim;
 
@@ -27,10 +25,11 @@ namespace StockMarketSim;
 public partial class MainPage : ContentPage {
 
 	// Initialize variables
-	private const int SearchDelay = 300;
 	private string fullpath;
 	private Portfolio user;
 	private IFileSaver fileSaver;
+	private AlphaVantageSearch FrontSTK;
+	private Portfolio.StockData stock;
 
 	private ObservableCollection<AlphaVantageSearch> Ticker { get; set; }
 
@@ -330,12 +329,21 @@ public partial class MainPage : ContentPage {
 	}
 
 	/// <summary>
+	/// Change the User Portfolio name
+	/// </summary>
+	/// <param name="sender">Pointer to the Button</param>
+	/// <param name="e">triggle an event</param>
+	private void BuyClick(object sender, EventArgs e) {
+		if (user is null) return;
+	}
+
+	/// <summary>
 	/// On the Search Bar, User will search either specific Ticker symbols or companies,
 	/// That will allow to display the best-matching symbols and market information based on keywords of user choice.
 	/// </summary>
 	/// <param name="sender"> Pointer to the Search Bar</param>
 	/// <param name="e"> triggle an event </param>
-	private async void OnTextChanged(object sender, EventArgs e) {
+	private async void Search(object sender, EventArgs e) {
 		SearchBar searchBar = (SearchBar) sender;
 		var query = searchBar.Text;
 
@@ -343,33 +351,81 @@ public partial class MainPage : ContentPage {
 		string apiKey = GetAPIKey();
 		string searchUrl = $"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={query}&apikey={apiKey}";
 
-		// a Delay in Search
-		await Task.Delay(SearchDelay);
 		if (!string.IsNullOrEmpty(query)) {
-			using (HttpClient client = new HttpClient()) {
-				HttpResponseMessage response = await client.GetAsync(searchUrl);
-				response.EnsureSuccessStatusCode();
-				var content = await response.Content.ReadAsStringAsync();
-				// Clear the Data Structue due to new keywords from User
-				Ticker.Clear();
-				// Parse JSON Doc in order to add info to the Data Structure
-				using (JsonDocument json = JsonDocument.Parse(content)) {
-					JsonElement root = json.RootElement;
-					JsonElement bestMatches = root.GetProperty("bestMatches");
-					foreach (var ele in bestMatches.EnumerateArray()) {
-						AlphaVantageSearch result = new AlphaVantageSearch {
-							Symbol = ele.GetProperty("1. symbol").ToString(),
-							Name = ele.GetProperty("2. name").ToString()
-						};
-						Ticker.Add(result);
-					}
-					ListView.ItemsSource = Ticker;
-				}
+			using HttpClient client = new HttpClient();
+			HttpResponseMessage response = await client.GetAsync(searchUrl);
+			response.EnsureSuccessStatusCode();
+			var content = await response.Content.ReadAsStringAsync();
+			// Clear the Data Structue due to new keywords from User
+			Ticker.Clear();
+			// Parse JSON Doc in order to add info to the Data Structure
+			using JsonDocument json = JsonDocument.Parse(content);
+			JsonElement root = json.RootElement;
+			JsonElement bestMatches = root.GetProperty("bestMatches");
+			foreach (var ele in bestMatches.EnumerateArray()) {
+				AlphaVantageSearch result = new() {
+					Symbol = ele.GetProperty("1. symbol").ToString(),
+					Name = ele.GetProperty("2. name").ToString()
+				};
+				Ticker.Add(result);
 			}
+			ListView.ItemsSource = Ticker;
 		} else {
 			// If the Search Bar has nothing, than no Data
 			Ticker.Clear();
 		}
+	}
+
+	/// <summary>
+	/// When User Select an item on the list, the Stock Data will be display on the Graph with it's data
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="e"></param>
+	private void OnItemSelected(object sender, SelectedItemChangedEventArgs e) {
+		if (e.SelectedItem != null) {
+			FrontSTK = e.SelectedItem as AlphaVantageSearch;
+
+			try {
+				stock = Portfolio.GetStockData(FrontSTK.Symbol).Result;
+				string[] display = DisplayStock(stock.Change, stock.Percent, stock.Date);
+				StockTinker.Text = $"{stock.Symbol}:";
+				StockName.Text = FrontSTK.Name;
+				StockPrice.Text = $"{stock.Price:C}";
+				StockChange.Text = display[0];
+				StockPercent.Text = display[1];
+				StockDate.Text = display[2];
+				ListView.SelectedItem = null;
+			} catch (Exception) {
+				ListView.SelectedItem = null;
+				return;
+			}
+		}
+	}
+
+	private string[] DisplayStock(decimal change, string percent, DateTime date) {
+		string[] result = new string[3];
+		// Remove the percentage sign and parse the numeric value
+		double numericValue = double.Parse(percent.TrimEnd('%'));
+
+		// Round the numeric value to two decimal places
+		double roundedValue = Math.Round(Math.Abs(numericValue), 2);
+
+		// Convert the rounded value back to a formatted percentage string
+		string formatPercent = roundedValue.ToString("F2") + "%";
+		if (change < 0.0m) {
+			StockPercent.TextColor = StockChange.TextColor = StockDate.TextColor = new Color(175, 15, 15, 255);
+			Background.BackgroundColor = new Color(253, 231, 229, 255);
+			result[0] = change.ToString("0.####");
+			result[1] = "\u2193" + formatPercent;
+		} else {
+			StockPercent.TextColor = StockChange.TextColor = StockDate.TextColor = new Color(20, 175, 50, 255);
+			Background.BackgroundColor = new Color(229, 244, 233, 255);
+			result[0] = $"+{change:0.####}";
+			result[1] = "\u2191" + formatPercent;
+		}
+		result[2] = date.ToString("D");
+		return result;
+
 	}
 
 	/// <summary>
@@ -390,18 +446,5 @@ public partial class MainPage : ContentPage {
 		public string Name { get; set; }
 	}
 
-	/// <summary>
-	/// When User Select an item on the list, the Stock Data will be display on the Graph with it's data
-	/// </summary>
-	/// <param name="sender"></param>
-	/// <param name="e"></param>
-	private void OnItemSelected(object sender, SelectedItemChangedEventArgs e) {
-		if (e.SelectedItem != null) {
-			var symbol = e.SelectedItem as AlphaVantageSearch;
-			// Do something with the selected symbol, such as navigating to a details page.
-			//TODO: Complete Logic
-			ListView.SelectedItem = null;
-		}
-	}
 }
 
