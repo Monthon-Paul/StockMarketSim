@@ -1,10 +1,5 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Text.Json;
-using System.Text.RegularExpressions;
+﻿using System.Text.Json;
 using Newtonsoft.Json;
-using System.Threading.Channels;
 using Microsoft.Extensions.Configuration;
 using System.Globalization;
 
@@ -60,7 +55,7 @@ public class Portfolio {
 				throw new PortfolioLoadException("Wrong version, is not a Stock Portfolio");
 			}
 			// Initialize types
-			this.name = data.name;
+			name = data.name;
 			userCashBalance = data.userCashBalance;
 			userPortfolio = data.userPortfolio;
 			this.version = version;
@@ -78,7 +73,7 @@ public class Portfolio {
 		this.name = name;
 		userCashBalance = 10_000;
 		userPortfolio = new();
-		this.version = "stk";
+		version = "stk";
 		change = true;
 	}
 
@@ -87,7 +82,7 @@ public class Portfolio {
 		this("Paul") {
 	}
 
-	public bool Changed { get => this.change; set => this.change = value; }
+	public bool Changed { get => change; set => change = value; }
 
 	/// <summary>
 	/// Writes the contents of User Portfolio to the named file using a JSON format.
@@ -105,7 +100,7 @@ public class Portfolio {
 	public void Save(string filename) {
 		// try to save the User Portfolio as a file
 		try {
-			string json = JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+			string json = JsonConvert.SerializeObject(this, Formatting.Indented);
 			change = false;
 			File.WriteAllText(filename, json);
 		} catch (Exception) {
@@ -127,7 +122,7 @@ public class Portfolio {
 	/// <exception cref="PortfolioLoadException">Throws an exception if the Spreadsheet fails to save</exception>
 	public string Save() {
 		// Write the User Portfolio as a JSON String
-		string json = JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+		string json = JsonConvert.SerializeObject(this, Formatting.Indented);
 		change = false;
 		return json;
 	}
@@ -268,13 +263,12 @@ public class Portfolio {
 	/// <summary>
 	/// Struct representing Stock Data
 	/// </summary>
-	private struct StockData {
+	public struct StockData {
 		public string Symbol { get; set; }
-		public decimal Open { get; set; }
-		public decimal High { get; set; }
-		public decimal Low { get; set; }
 		public decimal Price { get; set; }
 		public DateTime Date { get; set; }
+		public decimal Change { get; set; }
+		public string Percent { get; set; }
 	}
 
 	/// <summary>
@@ -282,33 +276,30 @@ public class Portfolio {
 	/// </summary>
 	/// <param name="symbol">Stock Ticker Symbol</param>
 	/// <returns> StockData </returns>
-	private static async Task<StockData> GetStockData(string symbol) {
+	public static async Task<StockData> GetStockData(string symbol) {
 		string apiKey = GetAPIKey();
 		string apiUrl = $"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={apiKey}";
 		string format = "yyyy-MM-dd";
 
-		using (HttpClient client = new HttpClient()) {
-			HttpResponseMessage response = await client.GetAsync(apiUrl);
-			response.EnsureSuccessStatusCode();
-			string result = await response.Content.ReadAsStringAsync();
-			using (JsonDocument json = JsonDocument.Parse(result)) {
-				JsonElement root = json.RootElement;
-				JsonElement globalQuote = root.GetProperty("Global Quote");
+		using HttpClient client = new();
+		HttpResponseMessage response = await client.GetAsync(apiUrl).ConfigureAwait(false);
+		response.EnsureSuccessStatusCode();
+		string result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+		using JsonDocument json = JsonDocument.Parse(result);
+		JsonElement root = json.RootElement;
+		JsonElement globalQuote = root.GetProperty("Global Quote");
 
-				StockData stockData = new StockData {
-					Symbol = globalQuote.GetProperty("01. symbol").GetString(),
-					Open = Convert.ToDecimal(globalQuote.GetProperty("02. open").GetString()),
-					High = Convert.ToDecimal(globalQuote.GetProperty("03. high").GetString()),
-					Low = Convert.ToDecimal(globalQuote.GetProperty("04. low").GetString()),
-					Price = Convert.ToDecimal(globalQuote.GetProperty("05. price").GetString()),
-					Date = DateTime.ParseExact(globalQuote.GetProperty("07. latest trading day").GetString(), format, CultureInfo.InvariantCulture),
-				};
+		StockData stockData = new() {
+			Symbol = globalQuote.GetProperty("01. symbol").GetString(),
+			Price = Convert.ToDecimal(globalQuote.GetProperty("05. price").GetString()),
+			Date = DateTime.ParseExact(globalQuote.GetProperty("07. latest trading day").GetString(), format, CultureInfo.InvariantCulture),
+			Change = Convert.ToDecimal(globalQuote.GetProperty("09. change").GetString()),
+			Percent = globalQuote.GetProperty("10. change percent").GetString()
+		};
 
-				//await Task.Delay(1000);
+		//await Task.Delay(1000);
 
-				return stockData;
-			}
-		}
+		return stockData;
 	}
 
 	/// <summary>
