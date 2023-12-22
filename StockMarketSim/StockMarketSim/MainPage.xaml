@@ -139,12 +139,13 @@
             <SearchBar x:Name= "SearchBar"
 				   Placeholder= "Enter a Ticker Symbol or Company Name"
                    SearchButtonPressed= "Search"
-				   WidthRequest= "400"/>
+				   WidthRequest= "400"
+                   BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"/>
             <ListView x:Name= "ListView"
 				  ItemSelected= "OnItemSelected"
 				  WidthRequest= "400">
-                <ListView.ItemTemplate >
-                    <DataTemplate >
+                <ListView.ItemTemplate>
+                    <DataTemplate>
                         <TextCell Text= "{Binding Symbol}"
 						          Detail= "{Binding Name}" />
                     </DataTemplate>

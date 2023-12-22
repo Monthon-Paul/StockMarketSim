@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Maui.Views;
 using Stock;
-using System.Threading.Channels;
 
 namespace StockMarketSim;
 
@@ -27,16 +26,19 @@ public partial class MainPage : ContentPage {
 	// Initialize variables
 	private string fullpath;
 	private Portfolio user;
-	private IFileSaver fileSaver;
+	private readonly IFileSaver fileSaver;
 	private AlphaVantageSearch FrontSTK;
 	private Portfolio.StockData stock;
+	private readonly StockChartViewModel chart;
 
 	private ObservableCollection<AlphaVantageSearch> Ticker { get; set; }
 
 	public MainPage(IFileSaver fileSaver) {
 		InitializeComponent();
 		Ticker = new();
+		chart = new();
 		this.fileSaver = fileSaver;
+		BindingContext = chart;
 	}
 
 	/// <summary>
@@ -73,7 +75,8 @@ public partial class MainPage : ContentPage {
 		// User wants to Create a New Portfolio
 		CreateNew:
 		string name = await DisplayPromptAsync("Enter a Name for Portfolio", "What's your name?");
-		if (name is null or "") return;
+		if (name is null or "")
+			return;
 		user = new(name);
 		fullpath = "";
 		LabelUser.Text = $"Portfolio Name: {user.name}";
@@ -120,7 +123,8 @@ public partial class MainPage : ContentPage {
 			// Makes sure that there is a name for the file or that the file open ends with ".stk"
 			// Otherwise don't change Portfolio
 			if (fileResult is not null) {
-				if (!fileResult.FileName.EndsWith("stk")) throw new Exception();
+				if (!fileResult.FileName.EndsWith("stk"))
+					throw new Exception();
 				fullpath = fileResult.FullPath;
 				user = new(fullpath, "stk");
 				LabelUser.Text = $"Portfolio Name: {user.name}";
@@ -141,7 +145,8 @@ public partial class MainPage : ContentPage {
 	/// <param name="e">triggle an event</param>
 	private void QuickSaveClick(object sender, EventArgs e) {
 		//Takes the already save path and update the Portfolio
-		if (user is null) return;
+		if (user is null)
+			return;
 		if (user.Changed) {
 			if (!File.Exists(fullpath)) {
 				SaveClick(sender, e);
@@ -278,7 +283,8 @@ public partial class MainPage : ContentPage {
 	private async void ChangeClick(object sender, EventArgs e) {
 		string name = await DisplayPromptAsync("Enter a Name for Portfolio", "Change Portfolio Name?");
 
-		if (name is null or "") return;
+		if (name is null or "")
+			return;
 		if (fullpath is not "") {
 			string filename = await DisplayPromptAsync("Update Portfolio filename", "Want to update your filename?", placeholder: name);
 			if (filename is not null or "") {
@@ -334,7 +340,8 @@ public partial class MainPage : ContentPage {
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
 	private void BuyClick(object sender, EventArgs e) {
-		if (user is null) return;
+		if (user is null)
+			return;
 	}
 
 	/// <summary>
@@ -352,7 +359,7 @@ public partial class MainPage : ContentPage {
 		string searchUrl = $"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={query}&apikey={apiKey}";
 
 		if (!string.IsNullOrEmpty(query)) {
-			using HttpClient client = new HttpClient();
+			using HttpClient client = new();
 			HttpResponseMessage response = await client.GetAsync(searchUrl);
 			response.EnsureSuccessStatusCode();
 			var content = await response.Content.ReadAsStringAsync();
@@ -377,6 +384,23 @@ public partial class MainPage : ContentPage {
 	}
 
 	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="symbol"></param>
+	/// <exception cref="NotImplementedException"></exception>
+	private async void DisplayStockChart(string symbol) {
+		// TODO: try to finish displaying stock into the chart
+		string apiKey = GetAPIKey();
+		string apiUrl = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={apiKey}";
+
+		using HttpClient client = new();
+		HttpResponseMessage response = await client.GetAsync(apiUrl).ConfigureAwait(false);
+		response.EnsureSuccessStatusCode();
+		string result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+		using JsonDocument json = JsonDocument.Parse(result);
+	}
+
+	/// <summary>
 	/// When User Select an item on the list, the Stock Data will be display on the Graph with it's data
 	/// </summary>
 	/// <param name="sender"></param>
@@ -386,6 +410,7 @@ public partial class MainPage : ContentPage {
 			FrontSTK = e.SelectedItem as AlphaVantageSearch;
 
 			try {
+				// Display Stock Data
 				stock = Portfolio.GetStockData(FrontSTK.Symbol).Result;
 				string[] display = DisplayStock(stock.Change, stock.Percent, stock.Date);
 				StockTinker.Text = $"{stock.Symbol}:";
@@ -394,6 +419,9 @@ public partial class MainPage : ContentPage {
 				StockChange.Text = display[0];
 				StockPercent.Text = display[1];
 				StockDate.Text = display[2];
+
+				DisplayStockChart(stock.Symbol);
+
 				ListView.SelectedItem = null;
 			} catch (Exception) {
 				ListView.SelectedItem = null;
@@ -402,6 +430,14 @@ public partial class MainPage : ContentPage {
 		}
 	}
 
+	/// <summary>
+	/// Modify or format chane, percent, and date depending on the Stock being positive or negative,
+	/// output an array with the store return to each modification
+	/// </summary>
+	/// <param name="change"> Stock Change number</param>
+	/// <param name="percent"> Stock Change Percentage</param>
+	/// <param name="date"> Date of time for Stock</param>
+	/// <returns> An String Arry with modify & formated change, percent, date </returns>
 	private string[] DisplayStock(decimal change, string percent, DateTime date) {
 		string[] result = new string[3];
 		// Remove the percentage sign and parse the numeric value
@@ -412,16 +448,20 @@ public partial class MainPage : ContentPage {
 
 		// Convert the rounded value back to a formatted percentage string
 		string formatPercent = roundedValue.ToString("F2") + "%";
+
+		// Determine modifying and formating to positive or negative
 		if (change < 0.0m) {
+			// Negative modification
 			StockPercent.TextColor = StockChange.TextColor = StockDate.TextColor = new Color(175, 15, 15, 255);
-			Background.BackgroundColor = new Color(253, 231, 229, 255);
+			Background.BackgroundColor = new Color(255, 230, 230, 255);
 			result[0] = change.ToString("0.####");
-			result[1] = "\u2193" + formatPercent;
+			result[1] = "\u2193" + formatPercent; // down arrow
 		} else {
+			// Positive modification
 			StockPercent.TextColor = StockChange.TextColor = StockDate.TextColor = new Color(20, 175, 50, 255);
-			Background.BackgroundColor = new Color(229, 244, 233, 255);
+			Background.BackgroundColor = new Color(230, 255, 230, 255);
 			result[0] = $"+{change:0.####}";
-			result[1] = "\u2191" + formatPercent;
+			result[1] = "\u2191" + formatPercent; // up arrow
 		}
 		result[2] = date.ToString("D");
 		return result;
