@@ -1,27 +1,27 @@
-﻿using System.Collections.Generic;
-using System.Text.Json;
-using System.Text.RegularExpressions;
-using Newtonsoft.Json;
+﻿using OoplesFinance.YahooFinanceAPI;
+using YahooQuotesApi;
 
 namespace StockData;
 
 public class StockData {
-	public string Symbol { get; set; }
+	public string? Symbol { get; set; }
 	public decimal Open { get; set; }
 	public decimal High { get; set; }
 	public decimal Low { get; set; }
 	public decimal Price { get; set; }
 	public DateTime Date { get; set; }
-	public string Percent { get; set; }
+	public string? Percent { get; set; }
 }
 
 public class GetStock {
 
 	private static decimal userCashBalance = 10_000;
-	private static Dictionary<string, int> userPortfolio = new();
+	private static Dictionary<string, int> userPortfolio = [];
+	private static YahooQuotes yahooQuotes = new YahooQuotesBuilder().Build();
 
 	public static void Main(string[] args) {
 		// Display menu
+		
 		while (true) {
 			Console.WriteLine("Stock Market Simulator");
 			Console.WriteLine("----------------------");
@@ -73,7 +73,7 @@ public class GetStock {
 		Console.WriteLine($"High: {stockData.High:C}");
 		Console.WriteLine($"Low: {stockData.Low:C}");
 		Console.WriteLine($"Price: {stockData.Price:C}");
-		Console.WriteLine($"Date: {stockData.Date.ToString("D")}");
+		Console.WriteLine($"Date: {stockData.Date:D}");
 		Console.WriteLine($"Change Percent: {stockData.Percent}");
 	}
 
@@ -161,53 +161,29 @@ public class GetStock {
 			Console.WriteLine($"{symbol}: {quantity} shares worth {value:C}");
 		}
 	}
+		public static async Task<StockData> GetStockData(string symbol) {
+			// YahooClient yahooClient = new();
+			// var autoCompleteList = await yahooClient.GetAutoCompleteInfoAsync("Google");
+			// var marketSummaryList = await yahooClient.GetMarketSummaryAsync();
+			// You could query multiple symbols with multiple fields through the following steps:
+		
+			var security = await yahooQuotes.GetAsync(symbol) ?? throw new Exception($"Failed to retrieve data for symbol {symbol}");
+        	var date = DateTimeOffset.FromUnixTimeSeconds(security.RegularMarketTimeSeconds);
+			var ask = security.Ask;
+			var bid = security.Bid;
 
-	public static async Task<StockData> GetStockData(string symbol) {
-		string apiKey = "CN0WTTYL7GCVQ5E3";
-		string apiUrl = $"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={apiKey}";
+            StockData stockData = new()
+            {
+                Symbol = security.Symbol.Name,
+                Open = Convert.ToDecimal(security.RegularMarketOpen),
+                High = Convert.ToDecimal(security.RegularMarketDayHigh),
+                Low = Convert.ToDecimal(security.RegularMarketDayLow),
+                Price = Convert.ToDecimal(security.RegularMarketPrice),
+                Date = date.DateTime,
+                Percent = security.RegularMarketChangePercent.ToString() ?? "0%"
+            };
 
-		using (HttpClient client = new HttpClient()) {
-			HttpResponseMessage response = await client.GetAsync(apiUrl);
-			if (response.IsSuccessStatusCode) {
-				string result = await response.Content.ReadAsStringAsync();
-				JsonDocument json = JsonDocument.Parse(result);
-				JsonElement root = json.RootElement;
-				JsonElement globalQuote = root.GetProperty("Global Quote");
-
-				StockData stockData = new StockData {
-					Symbol = globalQuote.GetProperty("01. symbol").GetString(),
-					Open = Convert.ToDecimal(globalQuote.GetProperty("02. open").GetString()),
-					High = Convert.ToDecimal(globalQuote.GetProperty("03. high").GetString()),
-					Low = Convert.ToDecimal(globalQuote.GetProperty("04. low").GetString()),
-					Price = Convert.ToDecimal(globalQuote.GetProperty("05. price").GetString()),
-					Date = DateFormat(globalQuote.GetProperty("07. latest trading day").GetString()),
-					Percent = globalQuote.GetProperty("10. change percent").GetString()
-				};
-
-				return stockData;
-			} else {
-				throw new Exception($"Failed to retrieve data for symbol {symbol}");
-			}
-		}
-	}
-
-	//private static async Task<AlphaVantageResponse> GetStockDaily(string symbol) {
-	//	string apiKey = "CN0WTTYL7GCVQ5E3";
-	//	string apiUrl = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={symbol}&apikey={apiKey}";
-
-	//	using (HttpClient client = new HttpClient()) {
-	//		HttpResponseMessage response = await client.GetAsync(apiUrl);
-	//		if (response.IsSuccessStatusCode) {
-	//			string result = await response.Content.ReadAsStringAsync();
-	//		} else {
-	//			throw new Exception($"Failed to retrieve data for symbol {symbol}");
-	//		}
-	//	}
-	//}
-
-	private static DateTime DateFormat(string date) {
-		string[] arr = date.Split('-');
-		return new DateTime(Int32.Parse(arr[0]), Int32.Parse(arr[1]), Int32.Parse(arr[2]));
-	}
+            return stockData;
+    }
 }
 
