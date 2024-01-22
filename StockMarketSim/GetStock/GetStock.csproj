@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="YahooQuotesApi" Version="5.5.5" />
   </ItemGroup>
 </Project>

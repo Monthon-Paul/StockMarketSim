@@ -1,5 +1,4 @@
-﻿using OoplesFinance.YahooFinanceAPI;
-using YahooQuotesApi;
+﻿using YahooQuotesApi;
 
 namespace StockData;
 
@@ -17,7 +16,7 @@ public class GetStock {
 
 	private static decimal userCashBalance = 10_000;
 	private static Dictionary<string, int> userPortfolio = [];
-	private static YahooQuotes yahooQuotes = new YahooQuotesBuilder().Build();
+	private static readonly YahooQuotes yahooQuotes = new YahooQuotesBuilder().Build();
 
 	public static void Main(string[] args) {
 		// Display menu
@@ -100,11 +99,10 @@ public class GetStock {
 				userCashBalance -= totalCost;
 
 				// Add shares to user's portfolio
-				if (userPortfolio.ContainsKey(symbol)) {
+				if (userPortfolio.ContainsKey(symbol))
 					userPortfolio[symbol] += quantity;
-				} else {
+				else
 					userPortfolio[symbol] = quantity;
-				}
 
 				Console.WriteLine("Purchase successful!");
 			} else {
@@ -161,29 +159,26 @@ public class GetStock {
 			Console.WriteLine($"{symbol}: {quantity} shares worth {value:C}");
 		}
 	}
-		public static async Task<StockData> GetStockData(string symbol) {
-			// YahooClient yahooClient = new();
-			// var autoCompleteList = await yahooClient.GetAutoCompleteInfoAsync("Google");
-			// var marketSummaryList = await yahooClient.GetMarketSummaryAsync();
-			// You could query multiple symbols with multiple fields through the following steps:
-		
-			var security = await yahooQuotes.GetAsync(symbol) ?? throw new Exception($"Failed to retrieve data for symbol {symbol}");
-        	var date = DateTimeOffset.FromUnixTimeSeconds(security.RegularMarketTimeSeconds);
-			var ask = security.Ask;
-			var bid = security.Bid;
+	public static async Task<StockData> GetStockData(string symbol) {
+		// YahooClient yahooClient = new();
+		// var autoCompleteList = await yahooClient.GetAutoCompleteInfoAsync("Google");
+		// var marketSummaryList = await yahooClient.GetMarketSummaryAsync();
+		// You could query multiple symbols with multiple fields through the following steps:
+	
+		var security = await yahooQuotes.GetAsync(symbol) ?? throw new Exception($"Failed to retrieve data for symbol {symbol}");
+		var date = DateTimeOffset.FromUnixTimeSeconds(security.RegularMarketTimeSeconds);
 
-            StockData stockData = new()
-            {
-                Symbol = security.Symbol.Name,
-                Open = Convert.ToDecimal(security.RegularMarketOpen),
-                High = Convert.ToDecimal(security.RegularMarketDayHigh),
-                Low = Convert.ToDecimal(security.RegularMarketDayLow),
-                Price = Convert.ToDecimal(security.RegularMarketPrice),
-                Date = date.DateTime,
-                Percent = security.RegularMarketChangePercent.ToString() ?? "0%"
-            };
+		StockData stockData = new() {
+			Symbol = security.Symbol.Name,
+			Open = Convert.ToDecimal(security.RegularMarketOpen),
+			High = Convert.ToDecimal(security.RegularMarketDayHigh),
+			Low = Convert.ToDecimal(security.RegularMarketDayLow),
+			Price = Convert.ToDecimal(security.RegularMarketPrice),
+			Date = date.DateTime,
+			Percent = security.RegularMarketChangePercent.ToString() ?? "0%"
+		};
 
-            return stockData;
+		return stockData;
     }
 }
 
