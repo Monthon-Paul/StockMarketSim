@@ -3,12 +3,12 @@ Authors: Monthon Paul
 
 Current Version: Working Progress
 
-Last Updated: 05/05/2023
+Last Updated: 01/22/2024
 
 # Purpose: 
 
 This Applicaiton is to replicate the Stock Market Simulator, it's to have the basis idea of how 
-the Stock Market works. For the program I am grabing all the Stock Data from Alpha Vantage API. The intend is it to be a small application where 
+the Stock Market works. For the program I am grabing all the Stock Data from a Yahoo Finance API. The intend is it to be a small application where 
 the User can Buy/Sell stocks to make a profit. The User can save their process into a ".stk" in JSON format, example being "stock.stk"
 
 For more details, please look in the "About"/"How to Use" in the help tab.
@@ -17,11 +17,11 @@ For more details, please look in the "About"/"How to Use" in the help tab.
 - [x] Finish Model Logic
 - [x] Add a serch bar for tinker search
 - [x] Add a Stock Market Chart UI
-- [X] Add Logic in Buttons & menu
+- [X] Added Some Logic Buttons & menu
+- [ ] Need to Fix Display Stock
 - [ ] Connect Model & View
 - [ ] Connect Ticker Search into Stock Chart UI
 - [ ] Build the Application
-- [ ] add extra features like Short selling (later)
  
 # How the StockMarketSim works:
 Users will start with a balance of $10,000 where they can play the game in order to make profit or lose profit. It's a simulator so the User can have experience learning how the Stock Market works and should learn how it works.
@@ -32,7 +32,7 @@ For more detailed explanations, take a look into the help tab for the Stock Mark
 
 # How to Setup:
 
-The Project was implemented in the .NET 7.0 Framwork & uses .NET MAUI for GUI, then require a compatible .NET SDK
+The Project was implemented in the .NET 8.0 Framwork & uses .NET MAUI for GUI, then require a compatible .NET SDK
 This Program can be run in the Visual Studio IDE, or can be build/run by the Command line
 
 #### Build 
@@ -54,11 +54,11 @@ Run the MAUI app either on Windows or MacOS (but first locate your directory for
 For MacOS
 ```
 cd StockMarketSim
-dotnet build -t:Run -f net7.0-maccatalyst
+dotnet build -t:Run -f net8.0-maccatalyst
 ```
 
 For Windows
 ```
 cd StockMarketSim
-dotnet build -t:Run -f net7.0-windows
+dotnet build -t:Run -f net8.0-windows
 ```
