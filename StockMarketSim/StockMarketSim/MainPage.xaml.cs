@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text;
-using System.Text.Json;
-using Microsoft.Extensions.Configuration;
+using OoplesFinance.YahooFinanceAPI;
+using OoplesFinance.YahooFinanceAPI.Enums;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Maui.Views;
 using Stock;
@@ -13,7 +13,7 @@ namespace StockMarketSim;
 ///
 /// This Applicaiton is to replicate the Stock Market Simulator,
 /// it's to have the basis idea of how the Stock Market works.
-/// For the program I am grabing all the Stock Data from Alpha Vantage API.
+/// For the program I am grabing all the Stock Data from Yahoo Finance API.
 /// The intend is it to be a small application where
 /// the User can Buy/Sell stocks to make a profit.
 /// The User can save their Portfolio into a ".stk" file in JSON format.
@@ -27,11 +27,10 @@ public partial class MainPage : ContentPage {
 	private string fullpath;
 	private Portfolio user;
 	private readonly IFileSaver fileSaver;
-	private AlphaVantageSearch FrontSTK;
+	private StockSearch FrontSTK;
 	private Portfolio.StockData stock;
 	private readonly StockChartViewModel chart;
-
-	private ObservableCollection<AlphaVantageSearch> Ticker { get; set; }
+	private ObservableCollection<StockSearch> Ticker { get; set; }
 
 	public MainPage(IFileSaver fileSaver) {
 		InitializeComponent();
@@ -62,7 +61,7 @@ public partial class MainPage : ContentPage {
 				}
 				try {
 					using var stream = new MemoryStream(Encoding.Default.GetBytes(user.Save()));
-					var path = await fileSaver.SaveAsync($"{user.name}.stk", stream, default);
+					var path = await fileSaver.SaveAsync($"{user.Name}.stk", stream, default);
 					if (!path.IsSuccessful) {
 						await DisplayAlert("Did not Save", "Didn't save the file, proceed in creating a new Portfolio.", "OK");
 					}
@@ -79,7 +78,7 @@ public partial class MainPage : ContentPage {
 			return;
 		user = new(name);
 		fullpath = "";
-		LabelUser.Text = $"Portfolio Name: {user.name}";
+		LabelUser.Text = $"Portfolio Name: {user.Name}";
 		SavePort.IsEnabled = SaveData.IsEnabled = Buy.IsEnabled = Sell.IsEnabled = Entry.IsEnabled = Broker.IsEnabled = Change.IsEnabled = true;
 	}
 
@@ -105,7 +104,7 @@ public partial class MainPage : ContentPage {
 				try {
 					// Save file that the User can choose where
 					using var stream = new MemoryStream(Encoding.Default.GetBytes(user.Save()));
-					var path = await fileSaver.SaveAsync($"{user.name}.stk", stream, default);
+					var path = await fileSaver.SaveAsync($"{user.Name}.stk", stream, default);
 					if (!path.IsSuccessful) {
 						await DisplayAlert("Did not Save", "Didn't save the file, proceed in loading a Portfolio.", "OK");
 					}
@@ -127,7 +126,7 @@ public partial class MainPage : ContentPage {
 					throw new Exception();
 				fullpath = fileResult.FullPath;
 				user = new(fullpath, "stk");
-				LabelUser.Text = $"Portfolio Name: {user.name}";
+				LabelUser.Text = $"Portfolio Name: {user.Name}";
 				SavePort.IsEnabled = SaveData.IsEnabled = Buy.IsEnabled = Sell.IsEnabled = Entry.IsEnabled = Broker.IsEnabled = Change.IsEnabled = true;
 			} else {
 				user.Changed = true;
@@ -148,11 +147,10 @@ public partial class MainPage : ContentPage {
 		if (user is null)
 			return;
 		if (user.Changed) {
-			if (!File.Exists(fullpath)) {
+			if (!File.Exists(fullpath))
 				SaveClick(sender, e);
-			} else {
+			 else
 				user.Save(fullpath);
-			}
 		}
 	}
 
@@ -175,7 +173,7 @@ public partial class MainPage : ContentPage {
 			try {
 				// Save file that the User can choose where
 				using var stream = new MemoryStream(Encoding.Default.GetBytes(user.Save()));
-				var path = await fileSaver.SaveAsync($"{user.name}.stk", stream, default);
+				var path = await fileSaver.SaveAsync($"{user.Name}.stk", stream, default);
 				if (!path.IsSuccessful) {
 					user.Changed = true;
 					if (await DisplayAlert("Fail to Save", "Please enter a valid name to save your file, " +
@@ -203,7 +201,7 @@ public partial class MainPage : ContentPage {
 		// Load HTML format for information
 		string HTML = LoadHtml("About.html");
 		// Add a button functions, i.e close popup
-		Button button = new Button {
+		Button button = new() {
 			Text = "Close",
 			VerticalOptions = LayoutOptions.Center,
 			HorizontalOptions = LayoutOptions.Center,
@@ -213,7 +211,7 @@ public partial class MainPage : ContentPage {
 		};
 
 		// Display a Popup displaying "about" the Program
-		Popup about = new Popup() {
+		Popup about = new() {
 			CanBeDismissedByTappingOutsideOfPopup = true,
 			Size = new Size(500, 500),
 			Content = new StackLayout {
@@ -244,7 +242,7 @@ public partial class MainPage : ContentPage {
 		// Load HTML format for information
 		string HTML = LoadHtml("HowToPlay.html");
 		// Add a button functions, i.e close popup
-		Button button = new Button {
+		Button button = new() {
 			Text = "Close",
 			VerticalOptions = LayoutOptions.Center,
 			HorizontalOptions = LayoutOptions.Center,
@@ -254,7 +252,7 @@ public partial class MainPage : ContentPage {
 		};
 
 		// Display a Popup displaying "How to Play" the Program
-		Popup HTP = new Popup() {
+		Popup HTP = new() {
 			CanBeDismissedByTappingOutsideOfPopup = true,
 			Size = new Size(520, 700),
 			Content = new StackLayout {
@@ -287,15 +285,14 @@ public partial class MainPage : ContentPage {
 			return;
 		if (fullpath is not "") {
 			string filename = await DisplayPromptAsync("Update Portfolio filename", "Want to update your filename?", placeholder: name);
-			if (filename is not null or "") {
+			if (filename is not null or "")
 				RenameFile(fullpath, filename);
-			} else {
+			else
 				await DisplayAlert("Didn't Update file name", "Haven't change the file name, Porfolio name have been updated.", "OK");
-			}
 		}
-		user.name = name;
+		user.Name = name;
 		user.Changed = true;
-		LabelUser.Text = $"Portfolio User: {user.name}";
+		LabelUser.Text = $"Portfolio User: {user.Name}";
 	}
 
 	/// <summary>
@@ -304,7 +301,7 @@ public partial class MainPage : ContentPage {
 	/// to save onto a string.
 	/// </summary>
 	/// <param name="html">Specifc file for html opening</param>
-	private string LoadHtml(string html) {
+	private static string LoadHtml(string html) {
 		using var stream = FileSystem.OpenAppPackageFileAsync(html);
 		using var reader = new StreamReader(stream.Result);
 
@@ -351,28 +348,19 @@ public partial class MainPage : ContentPage {
 	/// <param name="sender"> Pointer to the Search Bar</param>
 	/// <param name="e"> triggle an event </param>
 	private async void Search(object sender, EventArgs e) {
+		YahooClient yahooClient = new();
 		SearchBar searchBar = (SearchBar) sender;
 		var query = searchBar.Text;
-
-		// Connect ot API
-		string apiKey = GetAPIKey();
-		string searchUrl = $"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={query}&apikey={apiKey}";
-
+		
 		if (!string.IsNullOrEmpty(query)) {
-			using HttpClient client = new();
-			HttpResponseMessage response = await client.GetAsync(searchUrl);
-			response.EnsureSuccessStatusCode();
-			var content = await response.Content.ReadAsStringAsync();
+			// Connect ot API
+			var autoCompleteList = await yahooClient.GetAutoCompleteInfoAsync(query);
 			// Clear the Data Structue due to new keywords from User
 			Ticker.Clear();
-			// Parse JSON Doc in order to add info to the Data Structure
-			using JsonDocument json = JsonDocument.Parse(content);
-			JsonElement root = json.RootElement;
-			JsonElement bestMatches = root.GetProperty("bestMatches");
-			foreach (var ele in bestMatches.EnumerateArray()) {
-				AlphaVantageSearch result = new() {
-					Symbol = ele.GetProperty("1. symbol").ToString(),
-					Name = ele.GetProperty("2. name").ToString()
+			foreach (var ele in autoCompleteList) {
+				StockSearch result = new() {
+					Symbol = ele.Symbol,
+					Name = ele.Name
 				};
 				Ticker.Add(result);
 			}
@@ -380,38 +368,36 @@ public partial class MainPage : ContentPage {
 		} else {
 			// If the Search Bar has nothing, than no Data
 			Ticker.Clear();
+			ListView.ItemsSource = Ticker;
 		}
 	}
 
 	/// <summary>
-	/// 
+	/// Display Stock Chart UI from given ticker being clicked
 	/// </summary>
 	/// <param name="symbol"></param>
 	/// <exception cref="NotImplementedException"></exception>
 	private async void DisplayStockChart(string symbol) {
 		// TODO: try to finish displaying stock into the chart
-		string apiKey = GetAPIKey();
-		string apiUrl = $"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={apiKey}";
-
-		using HttpClient client = new();
-		HttpResponseMessage response = await client.GetAsync(apiUrl).ConfigureAwait(false);
-		response.EnsureSuccessStatusCode();
-		string result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-		using JsonDocument json = JsonDocument.Parse(result);
+		YahooClient yahooClient = new();
+		var startDate = DateTime.Now.AddMonths(-1);
+		var historicalDataList = await yahooClient.GetHistoricalDataAsync(symbol, DataFrequency.Daily, startDate);
 	}
 
-	/// <summary>
-	/// When User Select an item on the list, the Stock Data will be display on the Graph with it's data
-	/// </summary>
-	/// <param name="sender"></param>
-	/// <param name="e"></param>
-	private void OnItemSelected(object sender, SelectedItemChangedEventArgs e) {
+    /// <summary>
+    /// When User Select an item on the list, the Stock Data will be display on the Graph with it's data
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private async void OnItemSelected(object sender, SelectedItemChangedEventArgs e) {
 		if (e.SelectedItem != null) {
-			FrontSTK = e.SelectedItem as AlphaVantageSearch;
+			FrontSTK = e.SelectedItem as StockSearch;
 
 			try {
 				// Display Stock Data
-				stock = Portfolio.GetStockData(FrontSTK.Symbol).Result;
+				// TODO: This doesn't work, going to fix this when I get to it
+				// I don't know why it's not working ;_;
+				stock = await Portfolio.GetStockData(FrontSTK.Symbol); 
 				string[] display = DisplayStock(stock.Change, stock.Percent, stock.Date);
 				StockTinker.Text = $"{stock.Symbol}:";
 				StockName.Text = FrontSTK.Name;
@@ -420,10 +406,12 @@ public partial class MainPage : ContentPage {
 				StockPercent.Text = display[1];
 				StockDate.Text = display[2];
 
-				DisplayStockChart(stock.Symbol);
+				//DisplayStockChart(stock.Symbol);
 
 				ListView.SelectedItem = null;
-			} catch (Exception) {
+			} catch (Exception ex) {
+				Console.WriteLine(ex.Message);
+				Console.WriteLine(ex.StackTrace);
 				ListView.SelectedItem = null;
 				return;
 			}
@@ -437,7 +425,7 @@ public partial class MainPage : ContentPage {
 	/// <param name="change"> Stock Change number</param>
 	/// <param name="percent"> Stock Change Percentage</param>
 	/// <param name="date"> Date of time for Stock</param>
-	/// <returns> An String Arry with modify & formated change, percent, date </returns>
+	/// <returns> An String Array with modify and formated change, percent, date </returns>
 	private string[] DisplayStock(decimal change, string percent, DateTime date) {
 		string[] result = new string[3];
 		// Remove the percentage sign and parse the numeric value
@@ -468,20 +456,8 @@ public partial class MainPage : ContentPage {
 
 	}
 
-	/// <summary>
-	/// Get Alpha Vantage API key
-	/// </summary>
-	/// <returns> string representation for Alpha Vantage API key</returns>
-	private static string GetAPIKey() {
-		// Create an instance of IConfiguration
-		var config = new ConfigurationBuilder()
-			.AddUserSecrets<Portfolio>()
-			.Build();
-		return config["apiKey"];
-	}
-
 	// Class for Stock Data information
-	private class AlphaVantageSearch {
+	private class StockSearch {
 		public string Symbol { get; set; }
 		public string Name { get; set; }
 	}

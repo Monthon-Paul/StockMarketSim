@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using LiveChartsCore;
+﻿using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
@@ -12,7 +11,7 @@ namespace StockMarketSim;
 /// </summary>
 public partial class StockChartViewModel {
 	// we have to let the chart know that the X axis in days.
-	public Axis[] XAxes { get; set; } = {
+	public Axis[] XAxes { get; set; } = [
 		new Axis {
 			LabelsRotation = 15,
 			Labeler = value => new DateTime((long)value).ToString("MMM dd"),
@@ -22,12 +21,12 @@ public partial class StockChartViewModel {
             // the interval between our points is in days
             UnitWidth = TimeSpan.FromDays(1).Ticks
 		}
-	};
+	];
 
 	// Sample Data, need to change data from grabing from User Selection
-	public ISeries[] Series { get; set; } = {
+	public ISeries[] Series { get; set; } = [
 		new CandlesticksSeries<FinancialPoint> {
-			Values = new ObservableCollection<FinancialPoint> {
+			Values = [
                 // date, high, open, close, low
 				new(new DateTime(2021, 1, 1), 523, 500, 450, 400),
 				new(new DateTime(2021, 1, 2), 500, 450, 425, 400),
@@ -50,7 +49,7 @@ public partial class StockChartViewModel {
 				new(new DateTime(2021, 1, 19), 670, 650, 600, 570),
 				new(new DateTime(2021, 1, 20), 640, 600, 610, 560),
 				new(new DateTime(2021, 1, 21), 630, 610, 630, 590),
-			}
+			]
 		}
-	};
+	];
 }

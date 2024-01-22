@@ -138,7 +138,7 @@
         <StackLayout Grid.Column="1" Grid.RowSpan="3">
             <SearchBar x:Name= "SearchBar"
 				   Placeholder= "Enter a Ticker Symbol or Company Name"
-                   SearchButtonPressed= "Search"
+                   TextChanged= "Search"
 				   WidthRequest= "400"
                    BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"/>
             <ListView x:Name= "ListView"

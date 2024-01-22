@@ -28,9 +28,6 @@ public class Portfolio {
 	private readonly string version;
 	private bool change;
 
-	// Yahoo Finance API to grab Stock data
-	private static readonly YahooQuotes yahooQuotes = new YahooQuotesBuilder().Build();
-
 	// Broker buyer fee of 1% and selling fee of $10
 	private readonly decimal brokerBuyFee = 0.01m;
 	private readonly decimal brokerSellFee = 10;
@@ -279,7 +276,8 @@ public class Portfolio {
 	/// <param name="symbol">Stock Ticker Symbol</param>
 	/// <returns> StockData </returns>
 	public static async Task<StockData> GetStockData(string symbol) {
-
+		// Yahoo Finance API to grab Stock data
+		var yahooQuotes = new YahooQuotesBuilder().Build();
 		var security = await yahooQuotes.GetAsync(symbol) ?? throw new Exception($"Failed to retrieve data for symbol {symbol}");
 		var date = DateTimeOffset.FromUnixTimeSeconds(security.RegularMarketTimeSeconds);
 		var percent = security.RegularMarketChangePercent ?? 0.0;
