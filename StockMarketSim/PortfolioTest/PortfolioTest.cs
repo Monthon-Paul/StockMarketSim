@@ -9,7 +9,7 @@ namespace PortfolioTest;
 /// </summary>
 ///
 /// Author: Monthon Paul
-/// Version: March 8 2023
+/// Version: January 21, 2024
 [TestClass]
 public class PortfolioTest {
 	// ********************* Valid Testing *********************//
@@ -183,5 +183,25 @@ public class PortfolioTest {
 		user.BuyStocks("AAPL", 20);
 		Thread.Sleep(1000);
 		user.SellStocks("AAPL", 5);
+	}
+
+	/// <summary>
+	/// Testing Buying from Closed Market
+	/// </summary>
+	[TestMethod]
+	[ExpectedException(typeof(ClosedMarketException))]
+	public void TestBuyClosedStocks() {
+		Portfolio user = new();
+		user.BuyStocks("AAPL", 20);
+	}
+
+	/// <summary>
+	/// Testing Selling from Closed Market
+	/// </summary>
+	[TestMethod]
+	[ExpectedException(typeof(ClosedMarketException))]
+	public void TestSellClosedStocks() {
+		Portfolio user = new();
+		user.SellStocks("AAPL", 20);
 	}
 }

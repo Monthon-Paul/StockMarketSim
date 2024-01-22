@@ -10,6 +10,7 @@ public class StockData {
 	public decimal Price { get; set; }
 	public DateTime Date { get; set; }
 	public string? Percent { get; set; }
+	public string? State { get; set; }
 }
 
 public class GetStock {
@@ -74,6 +75,7 @@ public class GetStock {
 		Console.WriteLine($"Price: {stockData.Price:C}");
 		Console.WriteLine($"Date: {stockData.Date:D}");
 		Console.WriteLine($"Change Percent: {stockData.Percent}");
+		Console.WriteLine($"Market State: {stockData.State}");
 	}
 
 	private static void BuyStocks() {
@@ -176,7 +178,8 @@ public class GetStock {
 			Low = security.RegularMarketDayLow ?? 0m,
 			Price = security.RegularMarketPrice ?? 0m,
 			Date = date.DateTime,
-			Percent = percent.ToString("N2") + "%"
+			Percent = percent.ToString("N2") + "%",
+			State = security.MarketState
 		};
 
 		return stockData;

@@ -13,7 +13,7 @@ namespace Stock;
 /// </summary>
 /// 
 /// Author: Monthon Paul
-/// Version: January 21 2024
+/// Version: January 21, 2024
 [JsonObject(MemberSerialization.OptIn)]
 public class Portfolio {
 
@@ -134,7 +134,9 @@ public class Portfolio {
 	public void BuyStocks(string symbol, int quantity) {
 		// Retrieve stock data from API
 		StockData stockData = GetStockData(symbol).Result;
-
+		// Check the State of the Market
+		if(stockData.State == "CLOSED")
+			throw new ClosedMarketException("Can't Buy Shares when Market is Closed");
 		// User need to buy Stock more than ask size
 		if (quantity < stockData.AskSize)
 			throw new LowStockException($"Can't make transaction less than {stockData.AskSize} stocks");
@@ -181,6 +183,9 @@ public class Portfolio {
 	public void SellStocks(string symbol, int quantity) {
 		// Retrieve stock data from API
 		StockData stockData = GetStockData(symbol).Result;
+		// Check the State of the Market
+		if(stockData.State == "CLOSED")
+			throw new ClosedMarketException("Can't Sell Shares when Market is Closed");
 		// User can't sell shares less than bid size
 		if (quantity < stockData.BidSize)
 			throw new LowStockException("Can't sell Negative Stocks");
@@ -265,6 +270,7 @@ public class Portfolio {
 		public DateTime Date { get; set; }
 		public decimal Change { get; set; }
 		public string Percent { get; set; }
+		public string State { get; set; }
 	}
 
 	/// <summary>
@@ -285,7 +291,8 @@ public class Portfolio {
 			BidSize = security.BidSize ?? 0m,
 			Date = date.DateTime,
 			Change = security.RegularMarketChange ?? 0m,
-			Percent = percent.ToString("N2") + "%"
+			Percent = percent.ToString("N2") + "%",
+			State = security.MarketState
 		};
 
 		return stockData;
@@ -300,10 +307,18 @@ public class Portfolio {
     public class PortfolioLoadException(string msg) : Exception(msg) {}
 
     /// <summary>
-    /// Thrown to indicate that Negative Stocks is not an option
+    /// Thrown to indicate that Low Stocks is not an option
     /// </summary>
     /// <remarks>
     /// Creates the exception with a message
     /// </remarks>
     public class LowStockException(string msg) : Exception(msg) {}
+
+	/// <summary>
+    /// Thrown to indicate that can't buy/sell shares when Market Closed
+    /// </summary>
+    /// <remarks>
+    /// Creates the exception with a message
+    /// </remarks>
+    public class ClosedMarketException(string msg) : Exception(msg) {}
 }
