@@ -167,15 +167,16 @@ public class GetStock {
 	
 		var security = await yahooQuotes.GetAsync(symbol) ?? throw new Exception($"Failed to retrieve data for symbol {symbol}");
 		var date = DateTimeOffset.FromUnixTimeSeconds(security.RegularMarketTimeSeconds);
+		var percent = security.RegularMarketChangePercent ?? 0.0;
 
 		StockData stockData = new() {
 			Symbol = security.Symbol.Name,
-			Open = Convert.ToDecimal(security.RegularMarketOpen),
-			High = Convert.ToDecimal(security.RegularMarketDayHigh),
-			Low = Convert.ToDecimal(security.RegularMarketDayLow),
-			Price = Convert.ToDecimal(security.RegularMarketPrice),
+			Open = security.RegularMarketOpen ?? 0m,
+			High = security.RegularMarketDayHigh ?? 0m,
+			Low = security.RegularMarketDayLow ?? 0m,
+			Price = security.RegularMarketPrice ?? 0m,
 			Date = date.DateTime,
-			Percent = security.RegularMarketChangePercent.ToString() ?? "0%"
+			Percent = percent.ToString("N2") + "%"
 		};
 
 		return stockData;

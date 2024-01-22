@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Security.Cryptography;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Stock;
 using static Stock.Portfolio;
 
@@ -22,126 +19,126 @@ public class PortfolioTest {
 	/// </summary>
 	[TestMethod]
 	public void TestConstructor() {
-		Portfolio user1 = new Portfolio("Bob");
-		Portfolio user = new Portfolio();
+		Portfolio user1 = new("Bob");
+		Portfolio user = new();
 
 		Assert.AreEqual(0, user.GetShares("AAPL"));
-		Assert.AreEqual("Paul", user.name);
-		Assert.AreEqual(10_000, user.userCashBalance);
+		Assert.AreEqual("Paul", user.Name);
+		Assert.AreEqual(10_000, user.UserCashBalance);
 
 		Assert.AreEqual(0, user1.GetShares("AAPL"));
-		Assert.AreEqual("Bob", user1.name);
-		Assert.AreEqual(10_000, user1.userCashBalance);
+		Assert.AreEqual("Bob", user1.Name);
+		Assert.AreEqual(10_000, user1.UserCashBalance);
 	}
 
 	[TestMethod]
 	public void Test1Constructor() {
-		Portfolio user = new Portfolio("Bob");
+		Portfolio user = new("Bob");
 		user.BuyStocks("AAPL", 20);
 
 		Assert.AreEqual(20, user.GetShares("AAPL"));
-		Assert.AreEqual("Bob", user.name);
-		Assert.AreEqual(user.userCashBalance, user.userCashBalance);
+		Assert.AreEqual("Bob", user.Name);
+		Assert.AreEqual(user.UserCashBalance, user.UserCashBalance);
 	}
 
 	[TestMethod]
 	public void Test2Constructors() {
-		Portfolio user = new Portfolio();
+		Portfolio user = new();
 		user.BuyStocks("DAL", 15);
 		user.Save("TestSanitySave.txt");
 
-		Portfolio load = new Portfolio("TestSanitySave.txt", "stk");
+		Portfolio load = new("TestSanitySave.txt", "stk");
 
 		Assert.AreEqual(15, load.GetShares("DAL"));
-		Assert.AreEqual("Paul", load.name);
-		Assert.AreEqual(load.userCashBalance, load.userCashBalance);
+		Assert.AreEqual("Paul", load.Name);
+		Assert.AreEqual(load.UserCashBalance, load.UserCashBalance);
 	}
 
 	[TestMethod]
 	public void TestBuyGetShares() {
-		Portfolio user = new Portfolio();
+		Portfolio user = new();
 		user.BuyStocks("AAPL", 20);
-		Thread.Sleep(10000);
-		user.BuyStocks("DAL", 10);
-		Thread.Sleep(10000);
-		user.BuyStocks("F", 20);
+		Thread.Sleep(1000);
+		user.BuyStocks("DAL", 15);
+		Thread.Sleep(1000);
+		user.BuyStocks("F", 400);
 
 		Assert.AreEqual(20, user.GetShares("AAPL"));
-		Assert.AreEqual(10, user.GetShares("DAL"));
-		Assert.AreEqual(20, user.GetShares("F"));
-		Assert.AreEqual(user.userCashBalance, user.userCashBalance);
+		Assert.AreEqual(15, user.GetShares("DAL"));
+		Assert.AreEqual(400, user.GetShares("F"));
+		Assert.AreEqual(user.UserCashBalance, user.UserCashBalance);
 	}
 
 	[TestMethod]
 	public void TestSellGetShares() {
-		Portfolio user = new Portfolio();
+		Portfolio user = new();
 
-		Assert.AreEqual(10_000, user.userCashBalance);
+		Assert.AreEqual(10_000, user.UserCashBalance);
 
 		user.BuyStocks("AAPL", 20);
-		Thread.Sleep(20000);
+		Thread.Sleep(1000);
 		user.BuyStocks("DAL", 15);
-		Thread.Sleep(20000);
+		Thread.Sleep(1000);
 
 		user.SellStocks("AAPL", 15);
-		Thread.Sleep(20000);
+		Thread.Sleep(1000);
 		user.SellStocks("DAL", 15);
-		Thread.Sleep(20000);
+		Thread.Sleep(1000);
 
 		Assert.AreEqual(0, user.GetShares("DAL"));
 		Assert.AreEqual(5, user.GetShares("AAPL"));
-		Assert.AreEqual(user.userCashBalance, user.userCashBalance);
+		Assert.AreEqual(user.UserCashBalance, user.UserCashBalance);
 	}
 
 	[TestMethod]
 	public void TestSellSmallGetShares() {
-		Portfolio user = new Portfolio();
+		Portfolio user = new();
 
-		Assert.AreEqual(10_000, user.userCashBalance);
+		Assert.AreEqual(10_000, user.UserCashBalance);
 
-		user.BuyStocks("AAPL", 20);
-		Thread.Sleep(20000);
+		user.BuyStocks("AAPL", 30);
+		Thread.Sleep(5000);
 
 		user.SellStocks("AAPL", 15);
-		Thread.Sleep(20000);
-		user.SellStocks("AAPL", 5);
-		Thread.Sleep(20000);
+		Thread.Sleep(5000);
+		user.SellStocks("AAPL", 15);
+		Thread.Sleep(5000);
 
 		Assert.AreEqual(0, user.GetShares("AAPL"));
-		Assert.AreEqual(user.userCashBalance, user.userCashBalance);
+		Assert.AreEqual(user.UserCashBalance, user.UserCashBalance);
 	}
 
 	[TestMethod]
 	public void TestBuySharesBroker() {
-		Portfolio user = new Portfolio();
+		Portfolio user = new();
 		user.brokerslider();
 
-		Thread.Sleep(10000);
-		user.BuyStocks("AAPL", 10);
-		Thread.Sleep(10000);
+		Thread.Sleep(5000);
+		user.BuyStocks("AAPL", 20);
+		Thread.Sleep(5000);
 		user.BuyStocks("DAL", 50);
-		Thread.Sleep(10000);
+		Thread.Sleep(5000);
 
-		Assert.AreEqual(10, user.GetShares("AAPL"));
+		Assert.AreEqual(20, user.GetShares("AAPL"));
 		Assert.AreEqual(50, user.GetShares("DAL"));
-		Assert.AreEqual(user.userCashBalance, user.userCashBalance);
+		Assert.AreEqual(user.UserCashBalance, user.UserCashBalance);
 	}
 
 	[TestMethod]
 	public void TestSellSharesBroker() {
-		Portfolio user = new Portfolio();
+		Portfolio user = new();
 
-		Assert.AreEqual(10_000, user.userCashBalance);
+		Assert.AreEqual(10_000, user.UserCashBalance);
 
 		user.brokerslider();
 
-		user.BuyStocks("AAPL", 10);
-		Thread.Sleep(10000);
-		user.SellStocks("AAPL", 5);
-		Thread.Sleep(10000);
+		user.BuyStocks("AAPL", 20);
+		Thread.Sleep(5000);
+		user.SellStocks("AAPL", 15);
+		Thread.Sleep(5000);
 
 		Assert.AreEqual(5, user.GetShares("AAPL"));
-		Assert.AreEqual(user.userCashBalance, user.userCashBalance);
+		Assert.AreEqual(user.UserCashBalance, user.UserCashBalance);
 	}
 
 	//********************** Exception Testing ************************//
@@ -152,7 +149,7 @@ public class PortfolioTest {
 	[TestMethod]
 	[ExpectedException(typeof(LowStockException))]
 	public void TestZeroStocks() {
-		Portfolio user = new Portfolio();
+		Portfolio user = new();
 		user.BuyStocks("AAPL", 0);
 	}
 
@@ -162,17 +159,29 @@ public class PortfolioTest {
 	[TestMethod]
 	[ExpectedException(typeof(LowStockException))]
 	public void TestNegativeStocks() {
-		Portfolio user = new Portfolio();
+		Portfolio user = new();
 		user.BuyStocks("AAPL", -5);
 	}
 
 	/// <summary>
-	/// Testing Buying less than 10 Stocks
+	/// Testing Buying less than Ask Stocks
 	/// </summary>
 	[TestMethod]
 	[ExpectedException(typeof(LowStockException))]
-	public void TestLessThan10Stocks() {
-		Portfolio user = new Portfolio();
+	public void TestLessThanAskStocks() {
+		Portfolio user = new();
 		user.BuyStocks("AAPL", 5);
+	}
+
+	/// <summary>
+	/// Testing Buying less than Bid Stocks
+	/// </summary>
+	[TestMethod]
+	[ExpectedException(typeof(LowStockException))]
+	public void TestLessThanBidStocks() {
+		Portfolio user = new();
+		user.BuyStocks("AAPL", 20);
+		Thread.Sleep(1000);
+		user.SellStocks("AAPL", 5);
 	}
 }

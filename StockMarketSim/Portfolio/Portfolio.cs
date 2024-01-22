@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using Newtonsoft.Json;
-using Microsoft.Extensions.Configuration;
-using System.Globalization;
+using YahooQuotesApi;
 
 namespace Stock;
 
@@ -14,20 +13,23 @@ namespace Stock;
 /// </summary>
 /// 
 /// Author: Monthon Paul
-/// Version: May 5 2023
+/// Version: January 21 2024
 [JsonObject(MemberSerialization.OptIn)]
 public class Portfolio {
 
 	// Initialize variables
 	[JsonProperty(PropertyName = "Name")]
-	public string name { get; set; }
+	public string Name { get; set; }
 	[JsonProperty(PropertyName = "CashBalance")]
-	public decimal userCashBalance { get; private set; }
+	public decimal UserCashBalance { get; private set; }
 	[JsonProperty(PropertyName = "Shares")]
 	private Dictionary<string, int> userPortfolio;
 	[JsonProperty(PropertyName = "Versions")]
-	private string version;
+	private readonly string version;
 	private bool change;
+
+	// Yahoo Finance API to grab Stock data
+	private static readonly YahooQuotes yahooQuotes = new YahooQuotesBuilder().Build();
 
 	// Broker buyer fee of 1% and selling fee of $10
 	private readonly decimal brokerBuyFee = 0.01m;
@@ -45,18 +47,14 @@ public class Portfolio {
 		try {
 			// Read the file that makes a json to a Portfolio
 			string json = File.ReadAllText(pathToFile);
-			var data = JsonConvert.DeserializeObject<Portfolio>(json);
-			// Check if it's null when created
-			if (data is null) {
-				throw new PortfolioLoadException("Trouble opening your Portfolio");
-			}
-			// Check if the version match
-			if (!data.version.Equals(version)) {
+			var data = JsonConvert.DeserializeObject<Portfolio>(json) ?? throw new PortfolioLoadException("Trouble opening your Portfolio");
+            // Check if the version match
+            if (!data.version.Equals(version))
 				throw new PortfolioLoadException("Wrong version, is not a Stock Portfolio");
-			}
+				
 			// Initialize types
-			name = data.name;
-			userCashBalance = data.userCashBalance;
+			Name = data.Name;
+			UserCashBalance = data.UserCashBalance;
 			userPortfolio = data.userPortfolio;
 			this.version = version;
 		} catch (Exception) {
@@ -70,9 +68,9 @@ public class Portfolio {
 	/// </summary>
 	/// <param name="name"> User name of Portfolio</param>
 	public Portfolio(string name) {
-		this.name = name;
-		userCashBalance = 10_000;
-		userPortfolio = new();
+		Name = name;
+		UserCashBalance = 10_000;
+		userPortfolio = [];
 		version = "stk";
 		change = true;
 	}
@@ -134,12 +132,12 @@ public class Portfolio {
 	/// <param name="quantity"> Shares must be higher than 10 </param>
 	/// <exception cref="LowStockException"> an Error when either Shares are lower than 10 shares</exception>
 	public void BuyStocks(string symbol, int quantity) {
-		// User need to buy Stock more than 10
-		if (quantity < 10) {
-			throw new LowStockException("Can't make transaction less than 10 stocks");
-		}
 		// Retrieve stock data from API
 		StockData stockData = GetStockData(symbol).Result;
+
+		// User need to buy Stock more than ask size
+		if (quantity < stockData.AskSize)
+			throw new LowStockException($"Can't make transaction less than {stockData.AskSize} stocks");
 
 		// Calculate total cost of purchase
 		decimal totalCost = stockData.Price * quantity;
@@ -148,8 +146,8 @@ public class Portfolio {
 		switch (broker) {
 			case true:
 				// Deduct purchase cost from user's cash balance
-				if ((totalCost + fee) <= userCashBalance) {
-					userCashBalance -= (totalCost + fee);
+				if ((totalCost + fee) <= UserCashBalance) {
+					UserCashBalance -= totalCost + fee;
 				} else {
 					Console.WriteLine("Insufficient funds.");
 					return;
@@ -157,8 +155,8 @@ public class Portfolio {
 				break;
 			case false:
 				// Deduct purchase cost from user's cash balance
-				if (totalCost <= userCashBalance) {
-					userCashBalance -= totalCost;
+				if (totalCost <= UserCashBalance) {
+					UserCashBalance -= totalCost;
 				} else {
 					Console.WriteLine("Insufficient funds.");
 					return;
@@ -166,11 +164,10 @@ public class Portfolio {
 				break;
 		}
 		// Add shares to user's portfolio
-		if (userPortfolio.ContainsKey(symbol)) {
+		if (userPortfolio.ContainsKey(symbol))
 			userPortfolio[symbol] += quantity;
-		} else {
+		else
 			userPortfolio[symbol] = quantity;
-		}
 		Console.WriteLine("Purchase successful!");
 		change = true;
 	}
@@ -182,13 +179,12 @@ public class Portfolio {
 	/// <param name="quantity"> Shares must be higher than 10 </param>
 	/// <exception cref="LowStockException"> an Error when either Shares are lower than 10 shares</exception>
 	public void SellStocks(string symbol, int quantity) {
-		// User can't sell shares in the Negative value
-		if (quantity < 0) {
-			throw new LowStockException("Can't sell Negative Stocks");
-		}
 		// Retrieve stock data from API
 		StockData stockData = GetStockData(symbol).Result;
-
+		// User can't sell shares less than bid size
+		if (quantity < stockData.BidSize)
+			throw new LowStockException("Can't sell Negative Stocks");
+		
 		// Calculate total sale price
 		decimal totalSale = stockData.Price * quantity;
 		// User choice to have a Broker for transaction
@@ -203,17 +199,16 @@ public class Portfolio {
 		}
 		Logic:
 		// Check if user owns enough shares to sell
-		if (userPortfolio.ContainsKey(symbol) && userPortfolio[symbol] >= quantity) {
+		if (userPortfolio.TryGetValue(symbol, out int value) && value >= quantity) {
 			// Add sale price to user's cash balance
-			userCashBalance += totalSale;
+			UserCashBalance += totalSale;
 
 			// Remove shares from user's portfolio
 			userPortfolio[symbol] -= quantity;
 
 			// If Shares are at 0, then remove Ticker symbol for User
-			if (userPortfolio[symbol] is 0) {
+			if (userPortfolio[symbol] is 0)
 				userPortfolio.Remove(symbol);
-			}
 			Console.WriteLine("Sale successful!");
 			change = true;
 		} else {
@@ -227,11 +222,10 @@ public class Portfolio {
 	/// <param name="symbol">Stock Ticker Symbol</param>
 	/// <returns> The amount of Shares </returns>
 	public int GetShares(string symbol) {
-		if (userPortfolio.ContainsKey(symbol)) {
-			return userPortfolio[symbol];
-		} else {
+		if (userPortfolio.TryGetValue(symbol, out int value))
+			return value;
+		else
 			return 0;
-		}
 	}
 
 	/// <summary>
@@ -241,7 +235,7 @@ public class Portfolio {
 		Console.WriteLine("Portfolio:");
 		Console.WriteLine("----------");
 		// Display user's cash balance
-		Console.WriteLine($"Cash: {userCashBalance:C}");
+		Console.WriteLine($"Cash: {UserCashBalance:C}");
 
 		// Display user's stock holdings
 		foreach (string symbol in userPortfolio.Keys) {
@@ -266,6 +260,8 @@ public class Portfolio {
 	public struct StockData {
 		public string Symbol { get; set; }
 		public decimal Price { get; set; }
+		public decimal AskSize { get; set;}
+		public decimal BidSize { get; set;}
 		public DateTime Date { get; set; }
 		public decimal Change { get; set; }
 		public string Percent { get; set; }
@@ -277,64 +273,37 @@ public class Portfolio {
 	/// <param name="symbol">Stock Ticker Symbol</param>
 	/// <returns> StockData </returns>
 	public static async Task<StockData> GetStockData(string symbol) {
-		string apiKey = GetAPIKey();
-		string apiUrl = $"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={apiKey}";
-		string format = "yyyy-MM-dd";
 
-		using HttpClient client = new();
-		HttpResponseMessage response = await client.GetAsync(apiUrl).ConfigureAwait(false);
-		response.EnsureSuccessStatusCode();
-		string result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-		using JsonDocument json = JsonDocument.Parse(result);
-		JsonElement root = json.RootElement;
-		JsonElement globalQuote = root.GetProperty("Global Quote");
+		var security = await yahooQuotes.GetAsync(symbol) ?? throw new Exception($"Failed to retrieve data for symbol {symbol}");
+		var date = DateTimeOffset.FromUnixTimeSeconds(security.RegularMarketTimeSeconds);
+		var percent = security.RegularMarketChangePercent ?? 0.0;
 
 		StockData stockData = new() {
-			Symbol = globalQuote.GetProperty("01. symbol").GetString(),
-			Price = Convert.ToDecimal(globalQuote.GetProperty("05. price").GetString()),
-			Date = DateTime.ParseExact(globalQuote.GetProperty("07. latest trading day").GetString(), format, CultureInfo.InvariantCulture),
-			Change = Convert.ToDecimal(globalQuote.GetProperty("09. change").GetString()),
-			Percent = globalQuote.GetProperty("10. change percent").GetString()
+			Symbol = security.Symbol.Name,
+			Price = security.RegularMarketPrice ?? 0m,
+			AskSize = security.AskSize ?? 0m,
+			BidSize = security.BidSize ?? 0m,
+			Date = date.DateTime,
+			Change = security.RegularMarketChange ?? 0m,
+			Percent = percent.ToString("N2") + "%"
 		};
-
-		//await Task.Delay(1000);
 
 		return stockData;
 	}
 
-	/// <summary>
-	/// Get Alpha Vantage API key
-	/// </summary>
-	/// <returns> string representation for Alpha Vantage API key</returns>
-	private static string GetAPIKey() {
-		// Create an instance of IConfiguration
-		var config = new ConfigurationBuilder()
-			.AddUserSecrets<Portfolio>()
-			.Build();
-		return config["apiKey"];
-	}
+    /// <summary>
+    /// Thrown to indicate that a load attempt has failed.
+    /// </summary>
+    /// <remarks>
+    /// Creates the exception with a message
+    /// </remarks>
+    public class PortfolioLoadException(string msg) : Exception(msg) {}
 
-	/// <summary>
-	/// Thrown to indicate that a load attempt has failed.
-	/// </summary>
-	public class PortfolioLoadException : Exception {
-		/// <summary>
-		/// Creates the exception with a message
-		/// </summary>
-		public PortfolioLoadException(string msg)
-			: base(msg) {
-		}
-	}
-
-	/// <summary>
-	/// Thrown to indicate that Negative Stocks is not an option
-	/// </summary>
-	public class LowStockException : Exception {
-		/// <summary>
-		/// Creates the exception with a message
-		/// </summary>
-		public LowStockException(string msg)
-			: base(msg) {
-		}
-	}
+    /// <summary>
+    /// Thrown to indicate that Negative Stocks is not an option
+    /// </summary>
+    /// <remarks>
+    /// Creates the exception with a message
+    /// </remarks>
+    public class LowStockException(string msg) : Exception(msg) {}
 }
