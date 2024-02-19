@@ -32,6 +32,7 @@ public class Portfolio {
 	private readonly decimal brokerBuyFee = 0.01m;
 	private readonly decimal brokerSellFee = 10;
 	private bool broker = false;
+	private static YahooQuotes yahooQuotes = new YahooQuotesBuilder().WithoutHttpResilience().Build();
 
 	/// <summary>
 	/// 2 args Contructor for Portfolio
@@ -277,7 +278,6 @@ public class Portfolio {
 	/// <returns> StockData </returns>
 	public static async Task<StockData> GetStockData(string symbol) {
 		// Yahoo Finance API to grab Stock data
-		var yahooQuotes = new YahooQuotesBuilder().Build();
 		var security = await yahooQuotes.GetAsync(symbol) ?? throw new Exception($"Failed to retrieve data for symbol {symbol}");
 		var date = DateTimeOffset.FromUnixTimeSeconds(security.RegularMarketTimeSeconds);
 		var percent = security.RegularMarketChangePercent ?? 0.0;

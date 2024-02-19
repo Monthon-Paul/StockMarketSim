@@ -8,6 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="YahooQuotesApi" Version="5.5.5" />
+    <PackageReference Include="YahooQuotesApi" Version="5.5.6" />
   </ItemGroup>
 </Project>
