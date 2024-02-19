@@ -2,6 +2,7 @@
 using System.Text;
 using OoplesFinance.YahooFinanceAPI;
 using OoplesFinance.YahooFinanceAPI.Enums;
+using YahooQuotesApi;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Maui.Views;
 using Stock;
@@ -30,11 +31,13 @@ public partial class MainPage : ContentPage {
 	private StockSearch FrontSTK;
 	private Portfolio.StockData stock;
 	private readonly StockChartViewModel chart;
+	private YahooQuotes yahooQuotes;
 	private ObservableCollection<StockSearch> Ticker { get; set; }
 
 	public MainPage(IFileSaver fileSaver) {
+		yahooQuotes = new YahooQuotesBuilder().WithoutHttpResilience().Build();
 		InitializeComponent();
-		Ticker = new();
+		Ticker = [];
 		chart = new();
 		this.fileSaver = fileSaver;
 		BindingContext = chart;
@@ -397,7 +400,8 @@ public partial class MainPage : ContentPage {
 				// Display Stock Data
 				// TODO: This doesn't work, going to fix this when I get to it
 				// I don't know why it's not working ;_;
-				stock = await Portfolio.GetStockData(FrontSTK.Symbol); 
+				var security = await yahooQuotes.GetAsync(FrontSTK.Symbol) ?? throw new Exception($"Failed to retrieve data for symbol {FrontSTK.Symbol}");
+				//stock = await Portfolio.GetStockData();
 				string[] display = DisplayStock(stock.Change, stock.Percent, stock.Date);
 				StockTinker.Text = $"{stock.Symbol}:";
 				StockName.Text = FrontSTK.Name;
