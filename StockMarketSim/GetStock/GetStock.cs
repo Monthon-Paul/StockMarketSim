@@ -1,7 +1,6 @@
-﻿using YahooQuotesApi;
+﻿using OoplesFinance.YahooFinanceAPI;
 
 namespace StockData;
-
 public class StockData {
 	public string? Symbol { get; set; }
 	public decimal Open { get; set; }
@@ -17,8 +16,7 @@ public class GetStock {
 
 	private static decimal userCashBalance = 10_000;
 	private static Dictionary<string, int> userPortfolio = [];
-	private static readonly YahooQuotes yahooQuotes = new YahooQuotesBuilder().Build();
-
+	private static readonly YahooClient yahooClient = new();
 	public static void Main(string[] args) {
 		// Display menu
 		
@@ -162,24 +160,21 @@ public class GetStock {
 		}
 	}
 	public static async Task<StockData> GetStockData(string symbol) {
-		// YahooClient yahooClient = new();
-		// var autoCompleteList = await yahooClient.GetAutoCompleteInfoAsync("Google");
-		// var marketSummaryList = await yahooClient.GetMarketSummaryAsync();
-		// You could query multiple symbols with multiple fields through the following steps:
-	
-		var security = await yahooQuotes.GetAsync(symbol) ?? throw new Exception($"Failed to retrieve data for symbol {symbol}");
-		var date = DateTimeOffset.FromUnixTimeSeconds(security.RegularMarketTimeSeconds);
-		var percent = security.RegularMarketChangePercent ?? 0.0;
+		var realTimeQuoteList = await yahooClient.GetRealTimeQuotesAsync([symbol]) ?? throw new Exception($"Failed to retrieve data for symbol {symbol}");
+		var query = realTimeQuoteList.First();
+
+		var date = DateTimeOffset.FromUnixTimeSeconds((long)query.RegularMarketTime);
+		var percent = query.RegularMarketChangePercent ?? 0.0;
 
 		StockData stockData = new() {
-			Symbol = security.Symbol.Name,
-			Open = security.RegularMarketOpen ?? 0m,
-			High = security.RegularMarketDayHigh ?? 0m,
-			Low = security.RegularMarketDayLow ?? 0m,
-			Price = security.RegularMarketPrice ?? 0m,
+			Symbol = query.Symbol,
+			Open = (decimal?)query.RegularMarketOpen ?? 0m,
+			High = (decimal?)query.RegularMarketDayHigh ?? 0m,
+			Low = (decimal?)query.RegularMarketDayLow ?? 0m,
+			Price = (decimal?)query.RegularMarketPrice ?? 0m,
 			Date = date.DateTime,
 			Percent = percent.ToString("N2") + "%",
-			State = security.MarketState
+			State = query.MarketState
 		};
 
 		return stockData;

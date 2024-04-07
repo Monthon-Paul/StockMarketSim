@@ -9,6 +9,5 @@
 
   <ItemGroup>
     <PackageReference Include="OoplesFinance.YahooFinanceAPI" Version="1.6.4" />
-    <PackageReference Include="YahooQuotesApi" Version="5.5.7" />
   </ItemGroup>
 </Project>
