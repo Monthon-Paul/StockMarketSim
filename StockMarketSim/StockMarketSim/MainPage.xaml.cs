@@ -1,7 +1,8 @@
-﻿using System.Collections.ObjectModel;
-using System.Text;
+﻿using System.Text;
+using System.Collections.ObjectModel;
 using OoplesFinance.YahooFinanceAPI;
 using OoplesFinance.YahooFinanceAPI.Enums;
+using LiveChartsCore.Defaults;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Maui.Views;
 using Stock;
@@ -29,17 +30,14 @@ public partial class MainPage : ContentPage {
 	private readonly IFileSaver fileSaver;
 	private StockSearch FrontSTK;
 	private Portfolio.StockData stock;
-	private readonly StockChartViewModel chart;
 	private readonly YahooClient yahooClient;
 	private ObservableCollection<StockSearch> Ticker { get; set; }
 
 	public MainPage(IFileSaver fileSaver) {
 		InitializeComponent();
 		Ticker = [];
-		chart = new();
 		yahooClient = new();
 		this.fileSaver = fileSaver;
-		BindingContext = chart;
 	}
 
 	/// <summary>
@@ -49,9 +47,9 @@ public partial class MainPage : ContentPage {
 	/// <param name="e">triggle an event</param>
 	private async void NewClick(object sender, EventArgs e) {
 		// First check if there is a Portfolio, then Checks if the Portfoliio has been changed
-		if (user is null) {
+		if (user is null)
 			goto CreateNew;
-		} else if (user.Changed) {
+		else if (user.Changed) {
 			//Asks the user if they want to save or not, cancel feature so the it doesn't change user
 			bool confirm = await DisplayAlert("Unsaved changes", "Would you like to save changes?", "Yes", "No");
 			// User select Cancel does nothing
@@ -64,17 +62,16 @@ public partial class MainPage : ContentPage {
 				try {
 					using var stream = new MemoryStream(Encoding.Default.GetBytes(user.Save()));
 					var path = await fileSaver.SaveAsync($"{user.Name}.stk", stream, default);
-					if (!path.IsSuccessful) {
+					if (!path.IsSuccessful)
 						await DisplayAlert("Did not Save", "Didn't save the file, proceed in creating a new Portfolio.", "OK");
-					}
 				} catch (Exception) {
 					await DisplayAlert("Fail to Save", "Please enter a valid path to save your file, nothing is going to change.", "OK");
 					return;
 				}
 			}
 		}
-		// User wants to Create a New Portfolio
-		CreateNew:
+	// User wants to Create a New Portfolio
+	CreateNew:
 		string name = await DisplayPromptAsync("Enter a Name for Portfolio", "What's your name?");
 		if (name is null or "")
 			return;
@@ -91,9 +88,9 @@ public partial class MainPage : ContentPage {
 	/// <param name="e">triggle an event</param>
 	private async void LoadClick(object sender, EventArgs e) {
 		// First check if there is a Portfolio, then Checks if the Portfoliio has been changed
-		if (user is null) {
+		if (user is null)
 			goto LoadFile;
-		} else if (user.Changed) {
+		else if (user.Changed) {
 			//Asks the user if they want to save or not, cancel feature so the it doesn't change user
 			bool confirm = await DisplayAlert("Unsaved changes", "Would you like to save changes?", "Yes", "No");
 			// User select Cancel does nothing
@@ -107,17 +104,16 @@ public partial class MainPage : ContentPage {
 					// Save file that the User can choose where
 					using var stream = new MemoryStream(Encoding.Default.GetBytes(user.Save()));
 					var path = await fileSaver.SaveAsync($"{user.Name}.stk", stream, default);
-					if (!path.IsSuccessful) {
+					if (!path.IsSuccessful)
 						await DisplayAlert("Did not Save", "Didn't save the file, proceed in loading a Portfolio.", "OK");
-					}
 				} catch (Exception) {
 					await DisplayAlert("Fail to Save", "Please enter a valid path to save your file, nothing is going to change.", "OK");
 					return;
 				}
 			}
 		}
-		// Open Loaded Portfolio file
-		LoadFile:
+	// Open Loaded Portfolio file
+	LoadFile:
 		try {
 			//Grabs the name of the file
 			var fileResult = await FilePicker.PickAsync();
@@ -134,7 +130,8 @@ public partial class MainPage : ContentPage {
 				user.Changed = true;
 				await DisplayAlert("Did not Open file", "Didn't select a Portfolio file, nothing is going to change.", "OK");
 			}
-		} catch (Exception) {
+		}
+		catch (Exception) {
 			await DisplayAlert("Error Opening File", "Please open a file ending in \".stk\"", "OK");
 		}
 	}
@@ -151,7 +148,7 @@ public partial class MainPage : ContentPage {
 		if (user.Changed) {
 			if (!File.Exists(fullpath))
 				SaveClick(sender, e);
-			 else
+			else
 				user.Save(fullpath);
 		}
 	}
@@ -163,10 +160,10 @@ public partial class MainPage : ContentPage {
 	/// <param name="e">triggle an event</param>
 	private async void SaveClick(object sender, EventArgs e) {
 		// First check if there is a Portfolio, then Checks if the Portfoliio has been changed
-		if (user is null) {
+		if (user is null)
 			return;
-		} else if (user.Changed) {
-			SaveAgain:
+		else if (user.Changed) {
+		SaveAgain:
 			// checks if there is already a saved path, to just quickly save
 			if (File.Exists(fullpath)) {
 				QuickSaveClick(sender, e);
@@ -179,17 +176,15 @@ public partial class MainPage : ContentPage {
 				if (!path.IsSuccessful) {
 					user.Changed = true;
 					if (await DisplayAlert("Fail to Save", "Please enter a valid name to save your file, " +
-					"Do you want to save again?", "Yes", "Cancel")) {
+					"Do you want to save again?", "Yes", "Cancel"))
 						goto SaveAgain;
-					}
 				}
 				fullpath = path.FilePath;
 			} catch (Exception) {
 				// Ask the User if the wanting to Save again because of in valid path
 				if (await DisplayAlert("Fail to Save", "Please enter a valid path to save your file, " +
-					"Do you want to save again?", "Yes", "Cancel")) {
+					"Do you want to save again?", "Yes", "Cancel"))
 					goto SaveAgain;
-				}
 			}
 		}
 	}
@@ -350,9 +345,8 @@ public partial class MainPage : ContentPage {
 	/// <param name="sender"> Pointer to the Search Bar</param>
 	/// <param name="e"> triggle an event </param>
 	private async void Search(object sender, EventArgs e) {
-		SearchBar searchBar = (SearchBar) sender;
+		SearchBar searchBar = sender as SearchBar;
 		var query = searchBar.Text;
-		
 		if (!string.IsNullOrEmpty(query)) {
 			// Connect ot API
 			var autoCompleteList = await yahooClient.GetAutoCompleteInfoAsync(query);
@@ -382,17 +376,29 @@ public partial class MainPage : ContentPage {
 		// TODO: try to finish displaying stock into the chart
 		var startDate = DateTime.Now.AddMonths(-1);
 		var historicalDataList = await yahooClient.GetHistoricalDataAsync(symbol, DataFrequency.Daily, startDate);
+		var viewModel = BindingContext as StockChartViewModel;
+		viewModel.FinancialDataList.Clear();
+		// Assuming there's a ViewModel property or way to access the StockChartViewModel instance 
+		foreach (var data in historicalDataList) {
+			FinancialPoint newData = new() {
+				Date = data.Date,
+				High = data.High,
+				Low = data.Low,
+				Open = data.Open,
+				Close = data.Close
+			};
+			viewModel.FinancialDataList.Add(newData);
+		}
 	}
 
-    /// <summary>
-    /// When User Select an item on the list, the Stock Data will be display on the Graph with it's data
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private async void OnItemSelected(object sender, SelectedItemChangedEventArgs e) {
+	/// <summary>
+	/// When User Select an item on the list, the Stock Data will be display on the Graph with it's data
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="e"></param>
+	private async void OnItemSelected(object sender, SelectedItemChangedEventArgs e) {
 		if (e.SelectedItem != null) {
 			FrontSTK = e.SelectedItem as StockSearch;
-
 			try {
 				// Display Stock Data
 				stock = await Portfolio.GetStockData(FrontSTK.Symbol);
@@ -404,7 +410,7 @@ public partial class MainPage : ContentPage {
 				StockPercent.Text = display[1];
 				StockDate.Text = display[2];
 
-				//DisplayStockChart(stock.Symbol);
+				DisplayStockChart(stock.Symbol);
 
 				ListView.SelectedItem = null;
 			} catch (Exception) {
