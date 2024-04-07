@@ -16,7 +16,7 @@
     <ContentPage.BindingContext>
         <local:StockChartViewModel/>
     </ContentPage.BindingContext>
-    <Grid ColumnDefinitions = "2*, *"
+    <Grid ColumnDefinitions = "3*, *"
           RowDefinitions="75, 50, *, 75"
           RowSpacing="5">
         <HorizontalStackLayout
@@ -45,10 +45,10 @@
                VerticalOptions="Center"
                HorizontalOptions="Center"
                VerticalTextAlignment="Center"
-               HorizontalTextAlignment="Center" FontSize="Header"/>
+               HorizontalTextAlignment="Center" FontSize="Title"/>
         </HorizontalStackLayout>
         <VerticalStackLayout
-			Margin="10,0,0,0"
+			Margin="20,0,0,0"
             VerticalOptions="Center"
             Grid.Row="1">
             <HorizontalStackLayout
@@ -58,10 +58,10 @@
                 Margin="0,3">
                 <Label
                     x:Name="StockTinker"
-                    FontSize="Medium"/>
+                    FontSize="Title"/>
                 <Label
                     x:Name="StockName"
-                    FontSize="Medium"/>
+                    FontSize="Title"/>
             </HorizontalStackLayout>
             <HorizontalStackLayout
                 Spacing = "25"
@@ -81,22 +81,23 @@
                         x:Name="StockPercent"
                         VerticalOptions="Center"
                         HorizontalOptions="Center"
-                        FontSize="Header"/>
+                        FontSize="Large"/>
                 </Frame>
                 <Label
                     x:Name="StockChange"
                     VerticalOptions="Center"
                     HorizontalOptions="Center"
-                    FontSize="Large"/>
+                    FontSize="Title"/>
                 <Label
                     x:Name="StockDate"
                     VerticalOptions="Center"
                     HorizontalOptions="Center"
-                    FontSize="Large"/>
+                    FontSize="Title"/>
             </HorizontalStackLayout>
         </VerticalStackLayout>
         <lvc:CartesianChart
                 Grid.Row="2"
+                Margin="0,20,0,0"
                 Series="{Binding Series}"
                 XAxes="{Binding XAxes}">
         </lvc:CartesianChart>
