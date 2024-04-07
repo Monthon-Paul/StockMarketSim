@@ -2,7 +2,6 @@
 using System.Text;
 using OoplesFinance.YahooFinanceAPI;
 using OoplesFinance.YahooFinanceAPI.Enums;
-using YahooQuotesApi;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Maui.Views;
 using Stock;
@@ -31,14 +30,14 @@ public partial class MainPage : ContentPage {
 	private StockSearch FrontSTK;
 	private Portfolio.StockData stock;
 	private readonly StockChartViewModel chart;
-	private YahooQuotes yahooQuotes;
+	private readonly YahooClient yahooClient;
 	private ObservableCollection<StockSearch> Ticker { get; set; }
 
 	public MainPage(IFileSaver fileSaver) {
-		yahooQuotes = new YahooQuotesBuilder().WithoutHttpResilience().Build();
 		InitializeComponent();
 		Ticker = [];
 		chart = new();
+		yahooClient = new();
 		this.fileSaver = fileSaver;
 		BindingContext = chart;
 	}
@@ -351,7 +350,6 @@ public partial class MainPage : ContentPage {
 	/// <param name="sender"> Pointer to the Search Bar</param>
 	/// <param name="e"> triggle an event </param>
 	private async void Search(object sender, EventArgs e) {
-		YahooClient yahooClient = new();
 		SearchBar searchBar = (SearchBar) sender;
 		var query = searchBar.Text;
 		
@@ -382,7 +380,6 @@ public partial class MainPage : ContentPage {
 	/// <exception cref="NotImplementedException"></exception>
 	private async void DisplayStockChart(string symbol) {
 		// TODO: try to finish displaying stock into the chart
-		YahooClient yahooClient = new();
 		var startDate = DateTime.Now.AddMonths(-1);
 		var historicalDataList = await yahooClient.GetHistoricalDataAsync(symbol, DataFrequency.Daily, startDate);
 	}
@@ -398,10 +395,7 @@ public partial class MainPage : ContentPage {
 
 			try {
 				// Display Stock Data
-				// TODO: This doesn't work, going to fix this when I get to it
-				// I don't know why it's not working ;_;
-				var security = await yahooQuotes.GetAsync(FrontSTK.Symbol) ?? throw new Exception($"Failed to retrieve data for symbol {FrontSTK.Symbol}");
-				//stock = await Portfolio.GetStockData();
+				stock = await Portfolio.GetStockData(FrontSTK.Symbol);
 				string[] display = DisplayStock(stock.Change, stock.Percent, stock.Date);
 				StockTinker.Text = $"{stock.Symbol}:";
 				StockName.Text = FrontSTK.Name;
@@ -413,9 +407,7 @@ public partial class MainPage : ContentPage {
 				//DisplayStockChart(stock.Symbol);
 
 				ListView.SelectedItem = null;
-			} catch (Exception ex) {
-				Console.WriteLine(ex.Message);
-				Console.WriteLine(ex.StackTrace);
+			} catch (Exception) {
 				ListView.SelectedItem = null;
 				return;
 			}

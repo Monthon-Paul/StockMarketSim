@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using Newtonsoft.Json;
-using YahooQuotesApi;
+using OoplesFinance.YahooFinanceAPI;
 
 namespace Stock;
 
@@ -13,7 +13,7 @@ namespace Stock;
 /// </summary>
 /// 
 /// Author: Monthon Paul
-/// Version: January 21, 2024
+/// Version: April 7, 2024
 [JsonObject(MemberSerialization.OptIn)]
 public class Portfolio {
 
@@ -32,7 +32,7 @@ public class Portfolio {
 	private readonly decimal brokerBuyFee = 0.01m;
 	private readonly decimal brokerSellFee = 10;
 	private bool broker = false;
-	private static YahooQuotes yahooQuotes = new YahooQuotesBuilder().WithoutHttpResilience().Build();
+	private static readonly YahooClient yahooClient = new();
 
 	/// <summary>
 	/// 2 args Contructor for Portfolio
@@ -278,19 +278,20 @@ public class Portfolio {
 	/// <returns> StockData </returns>
 	public static async Task<StockData> GetStockData(string symbol) {
 		// Yahoo Finance API to grab Stock data
-		var security = await yahooQuotes.GetAsync(symbol) ?? throw new Exception($"Failed to retrieve data for symbol {symbol}");
-		var date = DateTimeOffset.FromUnixTimeSeconds(security.RegularMarketTimeSeconds);
-		var percent = security.RegularMarketChangePercent ?? 0.0;
+		var realTimeQuoteList = await yahooClient.GetRealTimeQuotesAsync([symbol]) ?? throw new Exception($"Failed to retrieve data for symbol {symbol}");
+		var query = realTimeQuoteList.First();
+		var date = DateTimeOffset.FromUnixTimeSeconds((long)query.RegularMarketTime);
+		var percent = query.RegularMarketChangePercent ?? 0.0;
 
 		StockData stockData = new() {
-			Symbol = security.Symbol.Name,
-			Price = security.RegularMarketPrice ?? 0m,
-			AskSize = security.AskSize ?? 0m,
-			BidSize = security.BidSize ?? 0m,
+			Symbol = query.Symbol,
+			Price = (decimal?)query.RegularMarketPrice ?? 0m,
+			AskSize = query.AskSize ?? 0m,
+			BidSize = query.BidSize ?? 0m,
 			Date = date.DateTime,
-			Change = security.RegularMarketChange ?? 0m,
+			Change = (decimal?)query.RegularMarketChange ?? 0m,
 			Percent = percent.ToString("N2") + "%",
-			State = security.MarketState
+			State = query.MarketState
 		};
 
 		return stockData;
