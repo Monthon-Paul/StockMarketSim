@@ -3,7 +3,7 @@ Authors: Monthon Paul
 
 Current Version: Working Progress
 
-Last Updated: 01/22/2024
+Last Updated: 04/07/2024
 
 # Purpose: 
 
@@ -13,15 +13,17 @@ the User can Buy/Sell stocks to make a profit. The User can save their process i
 
 For more details, please look in the "About"/"How to Use" in the help tab.
 
-# My Plans:
-- [x] Finish Model Logic
-- [x] Add a serch bar for tinker search
-- [x] Add a Stock Market Chart UI
+# Completed Plans:
 - [X] Added Some Logic Buttons & menu
-- [ ] Need to Fix Display Stock
-- [ ] Connect Model & View
-- [ ] Connect Ticker Search into Stock Chart UI
+- [X] Need to Fix Display Stock
+- [X] Connect Model & View
+- [X] Connect Ticker Search into Stock Chart UI
+
+# New Plans Plans:
 - [ ] Build the Application
+- [ ] Add Portfolio integration
+- [ ] Logic for Buttons
+- [ ] Display Portfolio Data
  
 # How the StockMarketSim works:
 Users will start with a balance of $10,000 where they can play the game in order to make profit or lose profit. It's a simulator so the User can have experience learning how the Stock Market works and should learn how it works.
