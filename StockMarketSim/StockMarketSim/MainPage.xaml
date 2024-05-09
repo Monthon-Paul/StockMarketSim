@@ -57,7 +57,7 @@
                 HorizontalOptions="Center"
                 Margin="0,3">
                 <Label
-                    x:Name="StockTinker"
+                    x:Name="StockTicker"
                     FontSize="Title"/>
                 <Label
                     x:Name="StockName"
@@ -113,7 +113,7 @@
                     HorizontalOptions="Center" VerticalOptions="Center"/>
             <Button x:Name="Sell"
                     Text = "Sell Shares"
-					Clicked="LoadClick"
+					Clicked="SellClick"
                     IsEnabled="False"
                     HorizontalOptions="Center" VerticalOptions="Center"/>
             <Entry x:Name="Entry"
@@ -152,11 +152,35 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <ListView
-                  Grid.Column="1"
-                  Grid.Row="3"
-				  WidthRequest= "400"
-                  Margin="10">
+                <ListView x:Name= "InfoView"
+                    Grid.Column="1"
+                    Grid.Row="3"
+                    WidthRequest= "400"
+                    Margin="10"
+                    SelectionMode="None">
+                    <ListView.ItemTemplate>
+                    <DataTemplate>
+                    <ViewCell>
+                        <Grid Margin="10"
+                        RowDefinitions="*"
+                        ColumnDefinitions="75, *, *">
+                            <Label
+                                Text="{Binding Name}"
+                                FontAttributes="Bold" />
+                            <Label
+                                Grid.Column="1"
+                                Text="{Binding Amount}"
+                                FontAttributes="Bold"
+                                VerticalOptions="Center" />
+                            <Label
+                                Grid.Column="2"
+                                Text="{Binding Balance}"
+                                FontAttributes="Bold"
+                                VerticalOptions="Center" />
+                        </Grid>
+                    </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
             </ListView>
         </StackLayout>
     </Grid>
