@@ -148,19 +148,15 @@ public partial class Portfolio {
 				// Deduct purchase cost from user's cash balance
 				if ((totalCost + fee) <= UserCashBalance)
 					UserCashBalance -= totalCost + fee;
-				else {
-					Console.WriteLine("Insufficient funds.");
-					return;
-				}
+				else
+					throw new InsufficientFundsException("Insufficient funds.");
 				break;
 			case false:
 				// Deduct purchase cost from user's cash balance
 				if (totalCost <= UserCashBalance)
 					UserCashBalance -= totalCost;
-				else {
-					Console.WriteLine("Insufficient funds.");
-					return;
-				}
+				else
+					throw new InsufficientFundsException("Insufficient funds.");
 				break;
 		}
 		// Add shares to user's portfolio
@@ -194,10 +190,8 @@ public partial class Portfolio {
 		if (broker) {
 			if (brokerSellFee < totalSale)
 				totalSale -= brokerSellFee;
-			else {
-				Console.WriteLine("Insufficient sale due to broker's $10 fee.");
-				return;
-			}
+			else
+				throw new InsufficientFundsException("Insufficient sale due to broker's $10 fee.");
 		}
 		// Check if user owns enough shares to sell
 		if (userPortfolio.TryGetValue(symbol, out int value) && value >= quantity) {
@@ -212,9 +206,8 @@ public partial class Portfolio {
 				userPortfolio.Remove(symbol);
 			Console.WriteLine("Sale successful!");
 			change = true;
-		} else {
-			Console.WriteLine("Insufficient shares Sold.");
-		}
+		} else
+			throw new InsufficientFundsException("Insufficient shares Sold.");
 	}
 
 	/// <summary>
@@ -300,7 +293,7 @@ public partial class Portfolio {
 		var query = realTimeQuoteList.First();
 		int quantity = userPortfolio[symbol];
 		decimal value = quantity * (decimal?)query.RegularMarketPrice ?? 0m;
-		return new Tuple<string, decimal>(query.LongName, value);
+		return new Tuple<string, decimal>(query.ShortName, value);
 	}
 
 	/// <summary>
@@ -326,4 +319,12 @@ public partial class Portfolio {
 	/// Creates the exception with a message
 	/// </remarks>
 	public class ClosedMarketException(string msg) : Exception(msg) { }
+
+	/// <summary>
+	/// Thrown to indicate that can't buy/sell shares when Insufficient funds
+	/// </summary>
+	/// <remarks>
+	/// Creates the exception with a message
+	/// </remarks>
+	public class InsufficientFundsException(string msg) : Exception(msg) { }
 }
