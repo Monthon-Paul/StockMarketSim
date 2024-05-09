@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using Stock;
+
 using static Stock.Portfolio;
 
 namespace PortfolioTest;
@@ -9,7 +11,7 @@ namespace PortfolioTest;
 /// </summary>
 ///
 /// Author: Monthon Paul
-/// Version: January 21, 2024
+/// Version: May 9, 2024
 [TestClass]
 public class PortfolioTest {
 	// ********************* Valid Testing *********************//
@@ -111,7 +113,7 @@ public class PortfolioTest {
 	[TestMethod]
 	public void TestBuySharesBroker() {
 		Portfolio user = new();
-		user.brokerslider();
+		user.Brokerslider(true);
 
 		Thread.Sleep(5000);
 		user.BuyStocks("AAPL", 20);
@@ -130,7 +132,7 @@ public class PortfolioTest {
 
 		Assert.AreEqual(10_000, user.UserCashBalance);
 
-		user.brokerslider();
+		user.Brokerslider(true);
 
 		user.BuyStocks("AAPL", 20);
 		Thread.Sleep(5000);

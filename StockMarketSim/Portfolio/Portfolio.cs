@@ -13,9 +13,9 @@ namespace Stock;
 /// </summary>
 /// 
 /// Author: Monthon Paul
-/// Version: April 7, 2024
+/// Version: May 9, 2024
 [JsonObject(MemberSerialization.OptIn)]
-public class Portfolio {
+public partial class Portfolio {
 
 	// Initialize variables
 	[JsonProperty(PropertyName = "Name")]
@@ -46,10 +46,10 @@ public class Portfolio {
 			// Read the file that makes a json to a Portfolio
 			string json = File.ReadAllText(pathToFile);
 			var data = JsonConvert.DeserializeObject<Portfolio>(json) ?? throw new PortfolioLoadException("Trouble opening your Portfolio");
-            // Check if the version match
-            if (!data.version.Equals(version))
+			// Check if the version match
+			if (!data.version.Equals(version))
 				throw new PortfolioLoadException("Wrong version, is not a Stock Portfolio");
-				
+
 			// Initialize types
 			Name = data.Name;
 			UserCashBalance = data.UserCashBalance;
@@ -129,11 +129,11 @@ public class Portfolio {
 	/// <param name="symbol"> Stock Ticker Symbol</param>
 	/// <param name="quantity"> Shares must be higher than 10 </param>
 	/// <exception cref="LowStockException"> an Error when either Shares are lower than 10 shares</exception>
-	public void BuyStocks(string symbol, int quantity) {
+	public async void BuyStocks(string symbol, int quantity) {
 		// Retrieve stock data from API
-		StockData stockData = GetStockData(symbol).Result;
+		StockData stockData = await GetStockData(symbol);
 		// Check the State of the Market
-		if(stockData.State == "CLOSED")
+		if (stockData.State == "CLOSED")
 			throw new ClosedMarketException("Can't Buy Shares when Market is Closed");
 		// User need to buy Stock more than ask size
 		if (quantity < stockData.AskSize)
@@ -146,18 +146,18 @@ public class Portfolio {
 		switch (broker) {
 			case true:
 				// Deduct purchase cost from user's cash balance
-				if ((totalCost + fee) <= UserCashBalance) {
+				if ((totalCost + fee) <= UserCashBalance)
 					UserCashBalance -= totalCost + fee;
-				} else {
+				else {
 					Console.WriteLine("Insufficient funds.");
 					return;
 				}
 				break;
 			case false:
 				// Deduct purchase cost from user's cash balance
-				if (totalCost <= UserCashBalance) {
+				if (totalCost <= UserCashBalance)
 					UserCashBalance -= totalCost;
-				} else {
+				else {
 					Console.WriteLine("Insufficient funds.");
 					return;
 				}
@@ -178,29 +178,27 @@ public class Portfolio {
 	/// <param name="symbol"> Stock Ticker Symbol</param>
 	/// <param name="quantity"> Shares must be higher than 10 </param>
 	/// <exception cref="LowStockException"> an Error when either Shares are lower than 10 shares</exception>
-	public void SellStocks(string symbol, int quantity) {
+	public async void SellStocks(string symbol, int quantity) {
 		// Retrieve stock data from API
-		StockData stockData = GetStockData(symbol).Result;
+		StockData stockData = await GetStockData(symbol);
 		// Check the State of the Market
-		if(stockData.State == "CLOSED")
+		if (stockData.State == "CLOSED")
 			throw new ClosedMarketException("Can't Sell Shares when Market is Closed");
 		// User can't sell shares less than bid size
 		if (quantity < stockData.BidSize)
 			throw new LowStockException("Can't sell Negative Stocks");
-		
+
 		// Calculate total sale price
 		decimal totalSale = stockData.Price * quantity;
 		// User choice to have a Broker for transaction
 		if (broker) {
-			if (brokerSellFee < totalSale) {
+			if (brokerSellFee < totalSale)
 				totalSale -= brokerSellFee;
-				goto Logic;
-			} else {
+			else {
 				Console.WriteLine("Insufficient sale due to broker's $10 fee.");
 				return;
 			}
 		}
-		Logic:
 		// Check if user owns enough shares to sell
 		if (userPortfolio.TryGetValue(symbol, out int value) && value >= quantity) {
 			// Add sale price to user's cash balance
@@ -232,6 +230,22 @@ public class Portfolio {
 	}
 
 	/// <summary>
+	/// Allow the User to get All Shares from Portfolio
+	/// </summary>
+	/// <returns> The amount of Shares </returns>
+	public Dictionary<string, int> GetAllShares() {
+		return userPortfolio;
+	}
+
+	/// <summary>
+	/// Switch between either User having a broker fee for transaction
+	/// </summary>
+	/// <returns></returns>
+	public bool Brokerslider(bool set) {
+		return broker = set;
+	}
+
+	/// <summary>
 	/// Print in Console info about Portfolio
 	/// </summary>
 	public void ViewPortfolio() {
@@ -250,29 +264,7 @@ public class Portfolio {
 	}
 
 	/// <summary>
-	/// Switch between either User having a broker fee for transaction
-	/// </summary>
-	/// <returns></returns>
-	public bool brokerslider() {
-		return broker is true ? broker = false : broker = true;
-	}
-
-	/// <summary>
-	/// Struct representing Stock Data
-	/// </summary>
-	public struct StockData {
-		public string Symbol { get; set; }
-		public decimal Price { get; set; }
-		public decimal AskSize { get; set;}
-		public decimal BidSize { get; set;}
-		public DateTime Date { get; set; }
-		public decimal Change { get; set; }
-		public string Percent { get; set; }
-		public string State { get; set; }
-	}
-
-	/// <summary>
-	/// Grab Stock Data from the Alpha Vantage API
+	/// Grab Stock Data from Yahoo Finance API
 	/// </summary>
 	/// <param name="symbol">Stock Ticker Symbol</param>
 	/// <returns> StockData </returns>
@@ -297,27 +289,41 @@ public class Portfolio {
 		return stockData;
 	}
 
-    /// <summary>
-    /// Thrown to indicate that a load attempt has failed.
-    /// </summary>
-    /// <remarks>
-    /// Creates the exception with a message
-    /// </remarks>
-    public class PortfolioLoadException(string msg) : Exception(msg) {}
-
-    /// <summary>
-    /// Thrown to indicate that Low Stocks is not an option
-    /// </summary>
-    /// <remarks>
-    /// Creates the exception with a message
-    /// </remarks>
-    public class LowStockException(string msg) : Exception(msg) {}
+	/// <summary>
+	/// Grab the Total Stock Price from Yahoo Finance API
+	/// </summary>
+	/// <param name="symbol">Stock Ticker Symbol</param>
+	/// <returns> Total amount of Stock Price </returns>
+	public async Task<Tuple<string, decimal>> GetTotalStockPrice(string symbol) {
+		// Yahoo Finance API to grab Stock data
+		var realTimeQuoteList = await yahooClient.GetRealTimeQuotesAsync([symbol]) ?? throw new Exception($"Failed to retrieve data for symbol {symbol}");
+		var query = realTimeQuoteList.First();
+		int quantity = userPortfolio[symbol];
+		decimal value = quantity * (decimal?)query.RegularMarketPrice ?? 0m;
+		return new Tuple<string, decimal>(query.LongName, value);
+	}
 
 	/// <summary>
-    /// Thrown to indicate that can't buy/sell shares when Market Closed
-    /// </summary>
-    /// <remarks>
-    /// Creates the exception with a message
-    /// </remarks>
-    public class ClosedMarketException(string msg) : Exception(msg) {}
+	/// Thrown to indicate that a load attempt has failed.
+	/// </summary>
+	/// <remarks>
+	/// Creates the exception with a message
+	/// </remarks>
+	public class PortfolioLoadException(string msg) : Exception(msg) { }
+
+	/// <summary>
+	/// Thrown to indicate that Low Stocks is not an option
+	/// </summary>
+	/// <remarks>
+	/// Creates the exception with a message
+	/// </remarks>
+	public class LowStockException(string msg) : Exception(msg) { }
+
+	/// <summary>
+	/// Thrown to indicate that can't buy/sell shares when Market Closed
+	/// </summary>
+	/// <remarks>
+	/// Creates the exception with a message
+	/// </remarks>
+	public class ClosedMarketException(string msg) : Exception(msg) { }
 }
