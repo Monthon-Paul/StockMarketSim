@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Newtonsoft.Json;
 using OoplesFinance.YahooFinanceAPI;
+using OoplesFinance.YahooFinanceAPI.Models;
 
 namespace Stock;
 
@@ -129,7 +130,7 @@ public partial class Portfolio {
 	/// <param name="symbol"> Stock Ticker Symbol</param>
 	/// <param name="quantity"> Shares must be higher than 10 </param>
 	/// <exception cref="LowStockException"> an Error when either Shares are lower than 10 shares</exception>
-	public async void BuyStocks(string symbol, int quantity) {
+	public async Task<bool> BuyStocks(string symbol, int quantity) {
 		// Retrieve stock data from API
 		StockData stockData = await GetStockData(symbol);
 		// Check the State of the Market
@@ -165,7 +166,7 @@ public partial class Portfolio {
 		else
 			userPortfolio[symbol] = quantity;
 		Console.WriteLine("Purchase successful!");
-		change = true;
+		return change = true;
 	}
 
 	/// <summary>
@@ -174,7 +175,7 @@ public partial class Portfolio {
 	/// <param name="symbol"> Stock Ticker Symbol</param>
 	/// <param name="quantity"> Shares must be higher than 10 </param>
 	/// <exception cref="LowStockException"> an Error when either Shares are lower than 10 shares</exception>
-	public async void SellStocks(string symbol, int quantity) {
+	public async Task<bool> SellStocks(string symbol, int quantity) {
 		// Retrieve stock data from API
 		StockData stockData = await GetStockData(symbol);
 		// Check the State of the Market
@@ -205,7 +206,7 @@ public partial class Portfolio {
 			if (userPortfolio[symbol] is 0)
 				userPortfolio.Remove(symbol);
 			Console.WriteLine("Sale successful!");
-			change = true;
+			return change = true;
 		} else
 			throw new InsufficientFundsException("Insufficient shares Sold.");
 	}
@@ -276,7 +277,7 @@ public partial class Portfolio {
 			Date = date.DateTime,
 			Change = (decimal?)query.RegularMarketChange ?? 0m,
 			Percent = percent.ToString("N2") + "%",
-			State = query.MarketState
+			State = query.MarketState,
 		};
 
 		return stockData;
