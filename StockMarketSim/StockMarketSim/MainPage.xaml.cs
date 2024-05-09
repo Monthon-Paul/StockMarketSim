@@ -32,10 +32,12 @@ public partial class MainPage : ContentPage {
 	private Portfolio.StockData stock;
 	private readonly YahooClient yahooClient;
 	private ObservableCollection<StockSearch> Ticker { get; set; }
+	private ObservableCollection<PortInfo> Port { get; set; }
 
 	public MainPage(IFileSaver fileSaver) {
 		InitializeComponent();
 		Ticker = [];
+		Port = [];
 		yahooClient = new();
 		this.fileSaver = fileSaver;
 	}
@@ -47,9 +49,7 @@ public partial class MainPage : ContentPage {
 	/// <param name="e">triggle an event</param>
 	private async void NewClick(object sender, EventArgs e) {
 		// First check if there is a Portfolio, then Checks if the Portfoliio has been changed
-		if (user is null)
-			goto CreateNew;
-		else if (user.Changed) {
+		if (user is not null && user.Changed) {
 			//Asks the user if they want to save or not, cancel feature so the it doesn't change user
 			bool confirm = await DisplayAlert("Unsaved changes", "Would you like to save changes?", "Yes", "No");
 			// User select Cancel does nothing
@@ -70,12 +70,22 @@ public partial class MainPage : ContentPage {
 				}
 			}
 		}
-	// User wants to Create a New Portfolio
-	CreateNew:
+		// User wants to Create a New Portfolio
+		CreateNew:
 		string name = await DisplayPromptAsync("Enter a Name for Portfolio", "What's your name?");
-		if (name is null or "")
+		if (string.IsNullOrEmpty(name))
 			return;
 		user = new(name);
+
+		// Add Portfolio information
+		Port.Clear();
+		Port.Add(new PortInfo { Name = "Balance:", Balance = user.UserCashBalance.ToString() });
+		foreach (var item in user.GetAllShares()) {
+			var result = await user.GetTotalStockPrice(item.Key);
+			Port.Add(new PortInfo { Name = $"{result.Item1}", Amount = $"{item.Value} Shares", Balance = $"${result.Item2}" });
+		}
+		InfoView.ItemsSource = Port;
+
 		fullpath = "";
 		LabelUser.Text = $"Portfolio Name: {user.Name}";
 		SavePort.IsEnabled = SaveData.IsEnabled = Buy.IsEnabled = Sell.IsEnabled = Entry.IsEnabled = Broker.IsEnabled = Change.IsEnabled = true;
@@ -88,9 +98,7 @@ public partial class MainPage : ContentPage {
 	/// <param name="e">triggle an event</param>
 	private async void LoadClick(object sender, EventArgs e) {
 		// First check if there is a Portfolio, then Checks if the Portfoliio has been changed
-		if (user is null)
-			goto LoadFile;
-		else if (user.Changed) {
+		if (user is not null && user.Changed) {
 			//Asks the user if they want to save or not, cancel feature so the it doesn't change user
 			bool confirm = await DisplayAlert("Unsaved changes", "Would you like to save changes?", "Yes", "No");
 			// User select Cancel does nothing
@@ -112,8 +120,8 @@ public partial class MainPage : ContentPage {
 				}
 			}
 		}
-	// Open Loaded Portfolio file
-	LoadFile:
+		// Open Loaded Portfolio file
+		LoadFile:
 		try {
 			//Grabs the name of the file
 			var fileResult = await FilePicker.PickAsync();
@@ -124,14 +132,23 @@ public partial class MainPage : ContentPage {
 					throw new Exception();
 				fullpath = fileResult.FullPath;
 				user = new(fullpath, "stk");
+
+				// Add Portfolio information
+				Port.Clear();
+				Port.Add(new PortInfo { Name = "Balance:", Balance = $"${user.UserCashBalance}" });
+				foreach (var item in user.GetAllShares()) {
+					var result = await user.GetTotalStockPrice(item.Key);
+					Port.Add(new PortInfo { Name = $"{result.Item1}", Amount = $"{item.Value} Shares", Balance = $"${result.Item2}" });
+				}
+				InfoView.ItemsSource = Port;
+
 				LabelUser.Text = $"Portfolio Name: {user.Name}";
 				SavePort.IsEnabled = SaveData.IsEnabled = Buy.IsEnabled = Sell.IsEnabled = Entry.IsEnabled = Broker.IsEnabled = Change.IsEnabled = true;
 			} else {
 				user.Changed = true;
 				await DisplayAlert("Did not Open file", "Didn't select a Portfolio file, nothing is going to change.", "OK");
 			}
-		}
-		catch (Exception) {
+		} catch (Exception) {
 			await DisplayAlert("Error Opening File", "Please open a file ending in \".stk\"", "OK");
 		}
 	}
@@ -163,7 +180,7 @@ public partial class MainPage : ContentPage {
 		if (user is null)
 			return;
 		else if (user.Changed) {
-		SaveAgain:
+			SaveAgain:
 			// checks if there is already a saved path, to just quickly save
 			if (File.Exists(fullpath)) {
 				QuickSaveClick(sender, e);
@@ -278,11 +295,11 @@ public partial class MainPage : ContentPage {
 	private async void ChangeClick(object sender, EventArgs e) {
 		string name = await DisplayPromptAsync("Enter a Name for Portfolio", "Change Portfolio Name?");
 
-		if (name is null or "")
+		if (string.IsNullOrEmpty(name))
 			return;
-		if (fullpath is not "") {
+		if (!string.IsNullOrEmpty(fullpath)) {
 			string filename = await DisplayPromptAsync("Update Portfolio filename", "Want to update your filename?", placeholder: name);
-			if (filename is not null or "")
+			if (!string.IsNullOrEmpty(fullpath))
 				RenameFile(fullpath, filename);
 			else
 				await DisplayAlert("Didn't Update file name", "Haven't change the file name, Porfolio name have been updated.", "OK");
@@ -329,13 +346,57 @@ public partial class MainPage : ContentPage {
 	}
 
 	/// <summary>
-	/// Change the User Portfolio name
+	/// Buy Stock Shares according to the amount of Shares display
 	/// </summary>
 	/// <param name="sender">Pointer to the Button</param>
 	/// <param name="e">triggle an event</param>
-	private void BuyClick(object sender, EventArgs e) {
+	private async void BuyClick(object sender, EventArgs e) {
 		if (user is null)
 			return;
+		if (!string.IsNullOrEmpty(Entry.Text) && int.TryParse(Entry.Text, out int amount)) {
+			user.Brokerslider(Broker.IsToggled);
+			try {
+				await user.BuyStocks(FrontSTK.Symbol, amount);
+
+				// Update Portfolio information
+				Port.Clear();
+				Port.Add(new PortInfo { Name = "Balance:", Balance = $"${user.UserCashBalance}" });
+				foreach (var item in user.GetAllShares()) {
+					var result = await user.GetTotalStockPrice(item.Key);
+					Port.Add(new PortInfo { Name = $"{result.Item1}", Amount = $"{item.Value} Shares", Balance = $"${result.Item2}" });
+				}
+				InfoView.ItemsSource = Port;
+			} catch (Exception exp) {
+				await DisplayAlert("Problem Purchasing Shares", exp.Message, "OK");
+			}
+		}
+	}
+
+	/// <summary>
+	/// Sell Stock Shares according to the amount of Shares display
+	/// </summary>
+	/// <param name="sender">Pointer to the Button</param>
+	/// <param name="e">triggle an event</param>
+	private async void SellClick(object sender, EventArgs e) {
+		if (user is null)
+			return;
+		if (!string.IsNullOrEmpty(Entry.Text) && int.TryParse(Entry.Text, out int amount)) {
+			user.Brokerslider(Broker.IsToggled);
+			try {
+                await user.SellStocks(FrontSTK.Symbol, amount);
+
+				// Update Portfolio information
+				Port.Clear();
+				Port.Add(new PortInfo { Name = "Balance:", Balance = $"${user.UserCashBalance}" });
+				foreach (var item in user.GetAllShares()) {
+					var result = await user.GetTotalStockPrice(item.Key);
+					Port.Add(new PortInfo { Name = $"{result.Item1}", Amount = $"{item.Value} Shares", Balance = $"${result.Item2}" });
+				}
+				InfoView.ItemsSource = Port;
+			} catch (Exception exp) {
+				await DisplayAlert("Problem Selling Shares", exp.Message, "OK");
+			}
+		}
 	}
 
 	/// <summary>
@@ -352,13 +413,8 @@ public partial class MainPage : ContentPage {
 			var autoCompleteList = await yahooClient.GetAutoCompleteInfoAsync(query);
 			// Clear the Data Structue due to new keywords from User
 			Ticker.Clear();
-			foreach (var ele in autoCompleteList) {
-				StockSearch result = new() {
-					Symbol = ele.Symbol,
-					Name = ele.Name
-				};
-				Ticker.Add(result);
-			}
+			foreach (var ele in autoCompleteList)
+				Ticker.Add(new StockSearch { Symbol = ele.Symbol, Name = ele.Name });
 			ListView.ItemsSource = Ticker;
 		} else {
 			// If the Search Bar has nothing, than no Data
@@ -379,16 +435,14 @@ public partial class MainPage : ContentPage {
 		var viewModel = BindingContext as StockChartViewModel;
 		viewModel.FinancialDataList.Clear();
 		// Assuming there's a ViewModel property or way to access the StockChartViewModel instance 
-		foreach (var data in historicalDataList) {
-			FinancialPoint newData = new() {
+		foreach (var data in historicalDataList)
+			viewModel.FinancialDataList.Add(new FinancialPoint {
 				Date = data.Date,
 				High = data.High,
 				Low = data.Low,
 				Open = data.Open,
 				Close = data.Close
-			};
-			viewModel.FinancialDataList.Add(newData);
-		}
+			});
 	}
 
 	/// <summary>
@@ -403,12 +457,14 @@ public partial class MainPage : ContentPage {
 				// Display Stock Data
 				stock = await Portfolio.GetStockData(FrontSTK.Symbol);
 				string[] display = DisplayStock(stock.Change, stock.Percent, stock.Date);
-				StockTinker.Text = $"{stock.Symbol}:";
+				StockTicker.Text = $"{stock.Symbol}:";
 				StockName.Text = FrontSTK.Name;
 				StockPrice.Text = $"{stock.Price:C}";
 				StockChange.Text = display[0];
 				StockPercent.Text = display[1];
 				StockDate.Text = display[2];
+				StockAsk.Text = $"Ask Size: {stock.AskSize}";
+				StockBid.Text = $"Bid Size: {stock.BidSize}";
 
 				DisplayStockChart(stock.Symbol);
 
@@ -457,12 +513,5 @@ public partial class MainPage : ContentPage {
 		return result;
 
 	}
-
-	// Class for Stock Data information
-	private class StockSearch {
-		public string Symbol { get; set; }
-		public string Name { get; set; }
-	}
-
 }
 
