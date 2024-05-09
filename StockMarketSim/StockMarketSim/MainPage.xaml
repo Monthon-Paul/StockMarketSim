@@ -93,6 +93,16 @@
                     VerticalOptions="Center"
                     HorizontalOptions="Center"
                     FontSize="Title"/>
+                <Label
+                    x:Name="StockAsk"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    FontSize="Title"/>
+                <Label
+                    x:Name="StockBid"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    FontSize="Title"/>
             </HorizontalStackLayout>
         </VerticalStackLayout>
         <lvc:CartesianChart
@@ -163,7 +173,7 @@
                     <ViewCell>
                         <Grid Margin="10"
                         RowDefinitions="*"
-                        ColumnDefinitions="75, *, *">
+                        ColumnDefinitions="100, *, *">
                             <Label
                                 Text="{Binding Name}"
                                 FontAttributes="Bold" />
