@@ -2,11 +2,6 @@
 <html>
 <head>
     <style>
-        :root {
-            --ion-color-primary: rgb(0, 255, 0);
-            --ion-color-secondary: rgb(255, 0, 0);
-        }
-
         body {
             font-size: 100%;
             padding-left: 15px;
@@ -51,10 +46,6 @@
             padding-left: 20px;
             padding-top: 5px;
             font-family: monospace;
-        }
-
-        ion-icon {
-            font-size: 16px;
         }
     </style>
 
@@ -160,9 +151,10 @@
             <b>Broker's' Fee:</b>
             <div class="description">
                 <p>
-                    An Option for the User if they want to turn on Broker's Fee.
-                    For Buy: Broker's Fee is 1% of the amount total cost fee from Shares
-                    For Sell: Broker's Fee is $10 from the total amount of Selling Shares
+                    An option for the User if they want to turn on Broker's Fee.
+                    For Buy: Broker's Fee is 1% of the amount total cost fee from Shares.
+                    For Sell: Broker's Fee is $10 from the total amount of Selling Shares.
+                    Emulate real life of purchasing or selling Stocks through Brokers.
                 </p>
             </div>
         </div>
@@ -218,17 +210,25 @@
             </div>
         </div>
         <div class="FunctionItem">
-            <b>Ticker Search</b>
+            <b>Ticker Search:</b>
             <div class="description">
                 <p>
-                    The Ticker Search feature is for the User to search for a specific Company by Name or Ticker
-                    to allow the User to Choose the company in order to be display in the graph displaying the Stock's history.
+                    The Ticker Search feature is for the User to search for a specific company by Name or Ticker.
+                    It allows the User to choose the company in order to be display in the graph displaying the Stock's history.
                     Allow the User to make the assumption in order to Buy/Sell.
                 </p>
             </div>
         </div>
+        <div class="FunctionItem">
+            <b>Portfolio Info:</b>
+            <div class="description">
+                <p>
+                    The bottom Right side display info of what stocks where purchase. There are three columns which display the
+                    Name of the company of the stock, the middle tells show many shares the User have purchase, the last column
+                    tells to total value calculated of the amount of shares multiply by the Regular Market Price.
+                </p>
+            </div>
+        </div>
     </section>
-    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 </body>
 </html>
