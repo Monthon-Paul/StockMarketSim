@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using Newtonsoft.Json;
 using OoplesFinance.YahooFinanceAPI;
-using OoplesFinance.YahooFinanceAPI.Models;
 
 namespace Stock;
 
