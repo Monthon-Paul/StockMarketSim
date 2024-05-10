@@ -80,9 +80,9 @@ public partial class MainPage : ContentPage {
 		// Add Portfolio information
 		Port.Clear();
 		Port.Add(new PortInfo { Name = "Balance:", Balance = user.UserCashBalance.ToString() });
-		foreach (var item in user.GetAllShares()) {
-			var result = await user.GetTotalStockPrice(item.Key);
-			Port.Add(new PortInfo { Name = $"{result.Item1}", Amount = $"{item.Value} Shares", Balance = $"${result.Item2}" });
+		foreach (var ticker in user.GetAllShares()) {
+			var result = await user.GetTotalStockPrice(ticker.Key, ticker.Value);
+			Port.Add(new PortInfo { Name = $"{result.Item1}", Amount = $"{ticker.Value} Shares", Balance = $"${result.Item2}" });
 		}
 		InfoView.ItemsSource = Port;
 
@@ -136,9 +136,9 @@ public partial class MainPage : ContentPage {
 				// Add Portfolio information
 				Port.Clear();
 				Port.Add(new PortInfo { Name = "Balance:", Balance = $"${user.UserCashBalance}" });
-				foreach (var item in user.GetAllShares()) {
-					var result = await user.GetTotalStockPrice(item.Key);
-					Port.Add(new PortInfo { Name = $"{result.Item1}", Amount = $"{item.Value} Shares", Balance = $"${result.Item2}" });
+				foreach (var ticker in user.GetAllShares()) {
+					var result = await user.GetTotalStockPrice(ticker.Key, ticker.Value);
+					Port.Add(new PortInfo { Name = $"{result.Item1}", Amount = $"{ticker.Value} Shares", Balance = $"${result.Item2}" });
 				}
 				InfoView.ItemsSource = Port;
 
@@ -356,14 +356,19 @@ public partial class MainPage : ContentPage {
 		if (!string.IsNullOrEmpty(Entry.Text) && int.TryParse(Entry.Text, out int amount)) {
 			user.Brokerslider(Broker.IsToggled);
 			try {
-				await user.BuyStocks(FrontSTK.Symbol, amount);
+				if (await user.BuyStocks(FrontSTK.Symbol, amount)) {
+					var result = await user.GetTotalStockPrice(FrontSTK.Symbol, amount);
+					await DisplayAlert("Successfully Purchase Shares!", 
+					$"Successfully completed the purchase of {amount} shares of {result.Item1} for a total price of ${result.Item2}.", 
+					"OK");
+				}
 
 				// Update Portfolio information
 				Port.Clear();
 				Port.Add(new PortInfo { Name = "Balance:", Balance = $"${user.UserCashBalance}" });
-				foreach (var item in user.GetAllShares()) {
-					var result = await user.GetTotalStockPrice(item.Key);
-					Port.Add(new PortInfo { Name = $"{result.Item1}", Amount = $"{item.Value} Shares", Balance = $"${result.Item2}" });
+				foreach (var ticker in user.GetAllShares()) {
+					var result = await user.GetTotalStockPrice(ticker.Key, ticker.Value);
+					Port.Add(new PortInfo { Name = $"{result.Item1}", Amount = $"{ticker.Value} Shares", Balance = $"${result.Item2}" });
 				}
 				InfoView.ItemsSource = Port;
 			} catch (Exception exp) {
@@ -383,14 +388,19 @@ public partial class MainPage : ContentPage {
 		if (!string.IsNullOrEmpty(Entry.Text) && int.TryParse(Entry.Text, out int amount)) {
 			user.Brokerslider(Broker.IsToggled);
 			try {
-                await user.SellStocks(FrontSTK.Symbol, amount);
+				if (await user.SellStocks(FrontSTK.Symbol, amount)) {
+					var result = await user.GetTotalStockPrice(FrontSTK.Symbol, amount);
+					await DisplayAlert("Successfully Sold Shares!",
+					$"Successfully sold {amount} shares of {result.Item1} for a total price of ${result.Item2}.",
+					"OK");
+				}
 
 				// Update Portfolio information
 				Port.Clear();
 				Port.Add(new PortInfo { Name = "Balance:", Balance = $"${user.UserCashBalance}" });
-				foreach (var item in user.GetAllShares()) {
-					var result = await user.GetTotalStockPrice(item.Key);
-					Port.Add(new PortInfo { Name = $"{result.Item1}", Amount = $"{item.Value} Shares", Balance = $"${result.Item2}" });
+				foreach (var ticker in user.GetAllShares()) {
+					var result = await user.GetTotalStockPrice(ticker.Key, ticker.Value);
+					Port.Add(new PortInfo { Name = $"{result.Item1}", Amount = $"{ticker.Value} Shares", Balance = $"${result.Item2}" });
 				}
 				InfoView.ItemsSource = Port;
 			} catch (Exception exp) {
@@ -514,4 +524,3 @@ public partial class MainPage : ContentPage {
 
 	}
 }
-
