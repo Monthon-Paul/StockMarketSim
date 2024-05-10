@@ -20,7 +20,7 @@ namespace StockMarketSim;
 /// The User can save their Portfolio into a ".stk" file in JSON format.
 ///
 /// Author: Monthon Paul
-/// Version: May 5, 2023
+/// Version: May 9, 2023
 /// </summary>
 public partial class MainPage : ContentPage {
 

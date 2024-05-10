@@ -36,7 +36,7 @@ public class PortfolioTest {
 	[TestMethod]
 	public void Test1Constructor() {
 		Portfolio user = new("Bob");
-		user.BuyStocks("AAPL", 20);
+        _ = user.BuyStocks("AAPL", 20);
 
 		Assert.AreEqual(20, user.GetShares("AAPL"));
 		Assert.AreEqual("Bob", user.Name);
@@ -46,7 +46,7 @@ public class PortfolioTest {
 	[TestMethod]
 	public void Test2Constructors() {
 		Portfolio user = new();
-		user.BuyStocks("DAL", 15);
+        _ = user.BuyStocks("DAL", 15);
 		user.Save("TestSanitySave.txt");
 
 		Portfolio load = new("TestSanitySave.txt", "stk");
@@ -59,11 +59,11 @@ public class PortfolioTest {
 	[TestMethod]
 	public void TestBuyGetShares() {
 		Portfolio user = new();
-		user.BuyStocks("AAPL", 10);
+        _ = user.BuyStocks("AAPL", 10);
 		Thread.Sleep(1000);
-		user.BuyStocks("DAL", 15);
+        _ = user.BuyStocks("DAL", 15);
 		Thread.Sleep(1000);
-		user.BuyStocks("F", 500);
+        _ = user.BuyStocks("F", 500);
 
 		Assert.AreEqual(10, user.GetShares("AAPL"));
 		Assert.AreEqual(15, user.GetShares("DAL"));
@@ -77,14 +77,14 @@ public class PortfolioTest {
 
 		Assert.AreEqual(10_000, user.UserCashBalance);
 
-		user.BuyStocks("AAPL", 20);
+        _ = user.BuyStocks("AAPL", 20);
 		Thread.Sleep(1000);
-		user.BuyStocks("DAL", 15);
+        _ = user.BuyStocks("DAL", 15);
 		Thread.Sleep(1000);
 
-		user.SellStocks("AAPL", 15);
+        _ = user.SellStocks("AAPL", 15);
 		Thread.Sleep(1000);
-		user.SellStocks("DAL", 15);
+        _ = user.SellStocks("DAL", 15);
 		Thread.Sleep(1000);
 
 		Assert.AreEqual(0, user.GetShares("DAL"));
@@ -98,12 +98,12 @@ public class PortfolioTest {
 
 		Assert.AreEqual(10_000, user.UserCashBalance);
 
-		user.BuyStocks("AAPL", 30);
+        _ = user.BuyStocks("AAPL", 30);
 		Thread.Sleep(5000);
 
-		user.SellStocks("AAPL", 15);
+        _ = user.SellStocks("AAPL", 15);
 		Thread.Sleep(5000);
-		user.SellStocks("AAPL", 15);
+        _ = user.SellStocks("AAPL", 15);
 		Thread.Sleep(5000);
 
 		Assert.AreEqual(0, user.GetShares("AAPL"));
@@ -116,9 +116,9 @@ public class PortfolioTest {
 		user.Brokerslider(true);
 
 		Thread.Sleep(5000);
-		user.BuyStocks("AAPL", 20);
+        _ = user.BuyStocks("AAPL", 20);
 		Thread.Sleep(5000);
-		user.BuyStocks("DAL", 50);
+        _ = user.BuyStocks("DAL", 50);
 		Thread.Sleep(5000);
 
 		Assert.AreEqual(20, user.GetShares("AAPL"));
@@ -134,9 +134,9 @@ public class PortfolioTest {
 
 		user.Brokerslider(true);
 
-		user.BuyStocks("AAPL", 20);
+        _ = user.BuyStocks("AAPL", 20);
 		Thread.Sleep(5000);
-		user.SellStocks("AAPL", 15);
+        _ = user.SellStocks("AAPL", 15);
 		Thread.Sleep(5000);
 
 		Assert.AreEqual(5, user.GetShares("AAPL"));
@@ -152,7 +152,7 @@ public class PortfolioTest {
 	[ExpectedException(typeof(LowStockException))]
 	public void TestZeroStocks() {
 		Portfolio user = new();
-		user.BuyStocks("AAPL", 0);
+        _ = user.BuyStocks("AAPL", 0);
 	}
 
 	/// <summary>
@@ -162,7 +162,7 @@ public class PortfolioTest {
 	[ExpectedException(typeof(LowStockException))]
 	public void TestNegativeStocks() {
 		Portfolio user = new();
-		user.BuyStocks("AAPL", -5);
+        _ = user.BuyStocks("AAPL", -5);
 	}
 
 	/// <summary>
@@ -172,7 +172,7 @@ public class PortfolioTest {
 	[ExpectedException(typeof(LowStockException))]
 	public void TestLessThanAskStocks() {
 		Portfolio user = new();
-		user.BuyStocks("F", 400);
+        _ = user.BuyStocks("F", 400);
 	}
 
 	/// <summary>
@@ -182,9 +182,9 @@ public class PortfolioTest {
 	[ExpectedException(typeof(LowStockException))]
 	public void TestLessThanBidStocks() {
 		Portfolio user = new();
-		user.BuyStocks("F", 500);
+        _ = user.BuyStocks("F", 500);
 		Thread.Sleep(1000);
-		user.SellStocks("F", 1);
+        _ = user.SellStocks("F", 1);
 	}
 
 	/// <summary>
@@ -194,7 +194,7 @@ public class PortfolioTest {
 	[ExpectedException(typeof(ClosedMarketException))]
 	public void TestBuyClosedStocks() {
 		Portfolio user = new();
-		user.BuyStocks("AAPL", 20);
+        _ = user.BuyStocks("AAPL", 20);
 	}
 
 	/// <summary>
@@ -204,7 +204,7 @@ public class PortfolioTest {
 	[ExpectedException(typeof(ClosedMarketException))]
 	public void TestSellClosedStocks() {
 		Portfolio user = new();
-		user.SellStocks("AAPL", 20);
+        _ = user.SellStocks("AAPL", 20);
 	}
 
 	/// <summary>
@@ -214,7 +214,7 @@ public class PortfolioTest {
 	[ExpectedException(typeof(InsufficientFundsException))]
 	public void TestBuyInsufficientStocks() {
 		Portfolio user = new();
-		user.BuyStocks("AAPL", 100);
+        _ = user.BuyStocks("AAPL", 100);
 	}
 
 	/// <summary>
@@ -224,6 +224,6 @@ public class PortfolioTest {
 	[ExpectedException(typeof(InsufficientFundsException))]
 	public void TestSellInsufficientStocks() {
 		Portfolio user = new();
-		user.SellStocks("AAPL", 100);
+        _ = user.SellStocks("AAPL", 100);
 	}
 }
