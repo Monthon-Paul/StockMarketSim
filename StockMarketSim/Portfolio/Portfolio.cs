@@ -165,7 +165,6 @@ public partial class Portfolio {
 			userPortfolio[symbol] += quantity;
 		else
 			userPortfolio[symbol] = quantity;
-		Console.WriteLine("Purchase successful!");
 		return change = true;
 	}
 
@@ -240,24 +239,6 @@ public partial class Portfolio {
 	}
 
 	/// <summary>
-	/// Print in Console info about Portfolio
-	/// </summary>
-	public void ViewPortfolio() {
-		Console.WriteLine("Portfolio:");
-		Console.WriteLine("----------");
-		// Display user's cash balance
-		Console.WriteLine($"Cash: {UserCashBalance:C}");
-
-		// Display user's stock holdings
-		foreach (string symbol in userPortfolio.Keys) {
-			int quantity = userPortfolio[symbol];
-			StockData stockData = GetStockData(symbol).Result;
-			decimal value = quantity * stockData.Price;
-			Console.WriteLine($"{symbol}: {quantity} shares worth {value:C}");
-		}
-	}
-
-	/// <summary>
 	/// Grab Stock Data from Yahoo Finance API
 	/// </summary>
 	/// <param name="symbol">Stock Ticker Symbol</param>
@@ -288,13 +269,12 @@ public partial class Portfolio {
 	/// </summary>
 	/// <param name="symbol">Stock Ticker Symbol</param>
 	/// <returns> Total amount of Stock Price </returns>
-	public async Task<Tuple<string, decimal>> GetTotalStockPrice(string symbol) {
+	public async Task<Tuple<string, decimal>> GetTotalStockPrice(string symbol, int quantity) {
 		// Yahoo Finance API to grab Stock data
 		var realTimeQuoteList = await yahooClient.GetRealTimeQuotesAsync([symbol]) ?? throw new Exception($"Failed to retrieve data for symbol {symbol}");
 		var query = realTimeQuoteList.First();
-		int quantity = userPortfolio[symbol];
 		decimal value = quantity * (decimal?)query.RegularMarketPrice ?? 0m;
-		return new Tuple<string, decimal>(query.ShortName, value);
+		return new Tuple<string, decimal>(query.DisplayName, value);
 	}
 
 	/// <summary>
