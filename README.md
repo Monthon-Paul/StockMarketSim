@@ -8,7 +8,7 @@ Last Updated: 05/10/2024
 # Purpose: 
 
 This Applicaiton is to replicate the Stock Market Simulator, it's to have the basis idea of how 
-the Stock Market works. For the program I am grabing all the Stock Data from a Yahoo Finance API. The intend is it to be a small application where 
+the Stock Market works. All the Stock Data is collected from a Yahoo Finance API. The intend is it to be a small application where 
 the User can Buy/Sell stocks to make a profit. The User can save their process into a ".stk" in JSON format, example being "stock.stk"
 
 For more details, please look in the "About"/"How to Use" in the help tab.
@@ -44,11 +44,11 @@ Run the MAUI app either on Windows or MacOS (but first locate your directory for
 For MacOS
 ```
 cd StockMarketSim
-dotnet build -t:Run -f net8.0-maccatalyst
+dotnet build -t:Run -f net8.0-maccatalyst --configuration Release
 ```
 
 For Windows
 ```
 cd StockMarketSim
-dotnet build -t:Run -f net8.0-windows
+dotnet build -t:Run -f net8.0-windows --configuration Release
 ```
