@@ -133,7 +133,7 @@ public partial class Portfolio {
 		// Retrieve stock data from API
 		StockData stockData = await GetStockData(symbol);
 		// Check the State of the Market
-		if (!stockData.State.Equals("OPENED"))
+		if (stockData.State.Equals("POSTPOST") || stockData.State.Equals("PREPRE"))
 			throw new ClosedMarketException("Can't Buy Shares when Market is Closed");
 		// User need to buy Stock more than ask size
 		if (quantity < stockData.AskSize)
@@ -177,7 +177,7 @@ public partial class Portfolio {
 		// Retrieve stock data from API
 		StockData stockData = await GetStockData(symbol);
 		// Check the State of the Market
-		if (!stockData.State.Equals("OPENED"))
+		if (stockData.State.Equals("POSTPOST") || stockData.State.Equals("PREPRE"))
 			throw new ClosedMarketException("Can't Sell Shares when Market is Closed");
 		// User can't sell shares less than bid size
 		if (quantity < stockData.BidSize)
