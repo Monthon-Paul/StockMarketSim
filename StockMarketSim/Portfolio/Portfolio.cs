@@ -273,7 +273,7 @@ public partial class Portfolio {
 		var realTimeQuoteList = await yahooClient.GetRealTimeQuotesAsync([symbol]) ?? throw new Exception($"Failed to retrieve data for symbol {symbol}");
 		var query = realTimeQuoteList.First();
 		decimal value = quantity * (decimal?)query.RegularMarketPrice ?? 0m;
-		return new Tuple<string, decimal>(query.DisplayName, value);
+		return new Tuple<string, decimal>(query.ShortName, value);
 	}
 
 	/// <summary>
