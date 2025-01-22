@@ -439,7 +439,6 @@ public partial class MainPage : ContentPage {
 	/// <param name="symbol"></param>
 	/// <exception cref="NotImplementedException"></exception>
 	private async void DisplayStockChart(string symbol) {
-		// TODO: try to finish displaying stock into the chart
 		var startDate = DateTime.Now.AddMonths(-1);
 		var historicalDataList = await yahooClient.GetHistoricalDataAsync(symbol, DataFrequency.Daily, startDate);
 		var viewModel = BindingContext as StockChartViewModel;

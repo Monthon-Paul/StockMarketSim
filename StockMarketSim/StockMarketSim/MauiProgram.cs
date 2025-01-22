@@ -2,6 +2,7 @@
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Storage;
+using LiveChartsCore.SkiaSharpView.Maui;
 
 namespace StockMarketSim;
 
@@ -9,7 +10,8 @@ public static class MauiProgram {
 	public static MauiApp CreateMauiApp() {
 		var builder = MauiApp.CreateBuilder();
 		builder
-			.UseSkiaSharp(true)
+			.UseSkiaSharp()
+			.UseLiveCharts()
 			.UseMauiApp<App>()
 			.UseMauiCommunityToolkit()
 			.ConfigureFonts(fonts => {
