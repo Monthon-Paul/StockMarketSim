@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>0c778eec-5885-4219-9016-9f126bfff480</UserSecretsId>
@@ -12,6 +12,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="OoplesFinance.YahooFinanceAPI" Version="1.6.4" />
+    <PackageReference Include="OoplesFinance.YahooFinanceAPI" Version="1.7.0" />
   </ItemGroup>
 </Project>
