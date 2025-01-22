@@ -23,7 +23,7 @@ For more detailed explanations, take a look into the help tab for the Stock Mark
 # How to Setup:
 
 The Project was implemented in the .NET 8.0 Framwork & uses .NET MAUI for GUI, then require a compatible .NET SDK
-This Program can be run in the Visual Studio IDE, or can be build/run by the Command line
+This Program can be run in the Visual Studio IDE that can be build/run by the Command line. Another way is a Downloadable Package is attach in this repository.
 
 #### Build 
 
